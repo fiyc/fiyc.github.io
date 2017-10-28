@@ -1,5 +1,5 @@
 ---
-title: 序.Github + Hexo 搭建博客
+title: Github + Hexo 搭建博客
 date: 2017-10-28 19:06:35
 tags:
 	- Github
