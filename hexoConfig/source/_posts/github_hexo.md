@@ -167,6 +167,7 @@ Next的[文档](http://theme-next.iissnan.com/getting-started.html)说的也很�
 ### 安装
 只需要直接将主题项目克隆到themes目录下即可  
 ```
+$ cd blog/hexoConfig
 $ git clone https://github.com/iissnan/hexo-theme-next themes/next
 ```
 
