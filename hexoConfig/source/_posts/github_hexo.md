@@ -8,7 +8,10 @@ categories:
 	- 不务正业
 ---
 
-今天尝试着用在github上搭建个人博客, 折腾了挺久, 最后弄完效果感觉还不错, 正好把建站过程写下作为这个博客的第一篇文章...
+> 今天尝试着用在github上搭建个人博客, 折腾了挺久, 最后弄完效果感觉还不错, 正好把建站过程写下作为这个博客的第一篇文章. 这篇文章主要教你如何使用Hexo与NexT主题创建基础的博客网站静态文件, 并利用GitHub Pages将他们发布.  
+
+<!-- more -->
+
 ## 环境准备
 * 安装Git
 * 安装Nodejs
@@ -94,10 +97,11 @@ $ git push origin hexo
 |   └── _posts
 └── themes
 ```
-接下来我们需要关注的文件主要有**_config.yml**, **themes**, 如果想了解更多的话还是建议仔细阅读官方文档.  
 
 ### 配置站点配置文件  
-打开**_config.yml**文件, 修改下面几项:   
+接下来我们进行一些最基本的配合, 如果想了解更多的话还是建议仔细阅读官方文档.  
+
+打开**blog/hexoConfig/_config.yml**文件, 修改下面几项:   
 ```
 title: 你的站点名
 author: 你的名字
@@ -109,6 +113,8 @@ deploy:
 	repo: 之前申请的仓库地址
 	branch: master
 ```
+
+在blog/hexoConfig/source目录下新建一个CNAME文件, 没错, 就是和前面说到的CNAME文件一模一样。
 
 ## 几个基本指令
 做到这里, 我们已经对Hexo进行了安装并且进行了最基础的配置, 现在我们可以使用Hexo生成静态页面并且部署至GitHub, 下面是一些常用的指令
@@ -153,7 +159,7 @@ $ hexo deploy
 ```
 $ hexo new [layout] <title>
 ```
-新建一篇文章。如果没有设置 layout 的话，默认使用 _config.yml 中的 default_layout 参数代替。如果标题包含空格的话，请使用引号括起来.新建的文章会在source/_posts目录下.  
+新建一篇文章。如果没有设置 layout 的话，默认使用 _config.yml 中的 default_layout 参数代替。如果标题包含空格的话，请使用引号括起来. 
 
 ## 使用NexT主题
 Next的[文档](http://theme-next.iissnan.com/getting-started.html)说的也很详细, 可以直接查阅  
@@ -165,6 +171,7 @@ $ git clone https://github.com/iissnan/hexo-theme-next themes/next
 ```
 
 ### 主题配置文件_config.yml的一些配置关键字
+主题的配置文件为 **blog/hexoConfig/themes/next/_config.yml**
 **设置菜单:**  menu 
 **设置风格:**  scheme 
 **设置侧边栏社交信息:**  social 
