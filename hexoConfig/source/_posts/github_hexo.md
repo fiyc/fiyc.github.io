@@ -165,11 +165,13 @@ $ hexo new [layout] <title>
 Next的[文档](http://theme-next.iissnan.com/getting-started.html)说的也很详细, 可以直接查阅  
 
 ### 安装
-只需要直接将主题项目克隆到themes目录下即可  
+1. 直接将主题项目克隆到themes目录下  
 ```
 $ cd blog/hexoConfig
 $ git clone https://github.com/iissnan/hexo-theme-next themes/next
 ```
+
+2. 修改项目配置文件blog/hexoConfig/_config.yml 下的theme, 将值改为next
 
 ### 主题配置文件_config.yml的一些配置关键字
 主题的配置文件为 **blog/hexoConfig/themes/next/_config.yml**
