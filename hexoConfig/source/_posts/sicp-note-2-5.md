@@ -13,7 +13,7 @@ categories:
 
 n下图展示了我们将要构造的系统的结构.  
 
-![图2-23](https://github.com/fiyc/StaticResource/blob/master/SICP_P_2_23.png?raw=true)  
+![图2-23][1]
 
 ### 2.5.1 通用型算术运算
 设计通用型算术运算的工作类似于设计通用型复数运算. 我们希望有一个通用型的加法过程`add`, 对于常规的数, 它的行为就像常规的基本加法`+`; 对于有理数, 它就像`add-rat`, 对于复数就像`add-complex`.  
@@ -130,7 +130,8 @@ Scheme数值包的用户可以通过下面的过程, 创建带标p志的常规�
 #### 类型的层次结构
 上面给出的强制模式, 依赖于一对对类型之间存在着某种自然的关系. 在实际中, 还常常存在着不同类型相互关系的更"全局性"的结构. 例如我们想要构造出一个通用型的算术系统, 处理整数, 有理数, 实数, 复数. 在这样的一个系统里, 一种很自然的做法是把整数看作是一类特殊的有理数, 而有理数又是一类特殊的实数, 实数转而又是一类特殊的复数, 这样我们实际就有了一个所谓的`类型的层次结构`. 其中, 整数是有理数的`子类型`, 有理数是整数的一个`超类型`.如下图:  
 
-![图2-25](https://github.com/fiyc/StaticResource/blob/master/SICP_P_2_25.png?raw=true)  
+
+![图2-25][2]
 
 塔类型有以下这么几个优点:  
 
@@ -199,4 +200,5 @@ Scheme数值包的用户可以通过下面的过程, 创建带标p志的常规�
 
 
 
-
+[1]: https://thumbnail10.baidupcs.com/thumbnail/666e4e1540a39522c8cb6a5fb5a646b9?fid=657587317-250528-59949746673506&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-gjCakaf2SbMsvpJ2tRTy%2B0wvmKc%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图2-23"
+[2]: https://thumbnail10.baidupcs.com/thumbnail/065adf86021e1bf95cc7cc30ede60502?fid=657587317-250528-126029435197510&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-gcpNQvzWmov5%2BErzM%2Fq%2BIJyEWEo%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图2-25"

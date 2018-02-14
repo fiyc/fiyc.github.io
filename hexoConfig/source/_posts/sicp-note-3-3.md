@@ -1192,17 +1192,19 @@ done
 #### 练习3.37
 	
 
-[1]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_16.png?raw=true "图3-16"
-[2]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_17.png?raw=true "图3-17"
-[3]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_19.png?raw=true "图3-19"
-[4]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_20.png?raw=true "图3-20"
-[5]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_21.png?raw=true "图3-21"
-[6]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_22.png?raw=true "图3-22"
-[7]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_23.png?raw=true "图3-23"
-[8]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_24.png?raw=true "图3-24"
-[9]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_25.png?raw=true "图3-25"
-[10]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_26.png?raw=true "图3-26"
-[11]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_E_3_29.png?raw=true "使用反门和与门构造或门"
-[12]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_28.png?raw=true "图3-28"
+
+[1]: https://thumbnail10.baidupcs.com/thumbnail/1f662f0f2fe716d55f34199664ec7ac5?fid=657587317-250528-449695631649007&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-wKXJDTb6E3LVR6PPj5m62i0P%2F%2FA%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042040022961461239&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-16"
+
+[2]: https://thumbnail10.baidupcs.com/thumbnail/80cb3f5f92755a390f1481ee27ab2048?fid=657587317-250528-605707191141090&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-fkeBXISxBMkfqNY2Ij1sQhP%2BqHM%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-17"
+[3]: https://thumbnail10.baidupcs.com/thumbnail/136c9d0515ced94fb11d19fc288b7f04?fid=657587317-250528-97146979080024&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-ptafKvmITyktYi6bGMHdKugK%2Blw%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-19"
+[4]: https://thumbnail10.baidupcs.com/thumbnail/2b8c6fbb625f4432577c45cae93a732b?fid=657587317-250528-716976889766051&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-%2FAWZCE%2BRIfICUICtpJB3bZzlUlw%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-20"
+[5]: https://thumbnail10.baidupcs.com/thumbnail/0c04b16622c1425f0b3774710f82cce0?fid=657587317-250528-689668354037032&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-6C6OxYEfLYrqzYj%2BZNZSwEu2r7Y%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-21"
+[6]: https://thumbnail10.baidupcs.com/thumbnail/8448e042fa08772c2b82c412938a5646?fid=657587317-250528-289464967267465&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-OK2k486V7EY8mxC8SEN3zbumRyM%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-22"
+[7]: https://thumbnail10.baidupcs.com/thumbnail/00be0f5324e6084bfdc9cd28b4ccf33f?fid=657587317-250528-1014469346243106&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-P2qnDnjajAhql81aDZ1AvrQBbVA%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-23"
+[8]: https://thumbnail10.baidupcs.com/thumbnail/4ead037a9f9d965d26528c9854f9087c?fid=657587317-250528-1076228349742676&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-RVPfng1BvNOXWYziAEGogb2tfSI%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-24"
+[9]: https://thumbnail10.baidupcs.com/thumbnail/468257512260d32ba3b0f1714492ae28?fid=657587317-250528-988998594122420&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-ug%2FphyTvJ%2FTtDUonbcK33%2BqvCe0%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-25"
+[10]: https://thumbnail10.baidupcs.com/thumbnail/df1aef51952023fa73fb7b55b884c60b?fid=657587317-250528-1090039348060938&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-Ircfm5m92IIP4u1zaWIzzng2GV8%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-26"
+[11]: https://thumbnail10.baidupcs.com/thumbnail/badf2723567a14abb6d1811d97d16e5e?fid=657587317-250528-658124031707089&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-koPMGqXmAaNQLiJ9n0Pn1JQ9Rz8%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "3-29 使用反门和与门构造或门"
+[12]: https://thumbnail10.baidupcs.com/thumbnail/6f1b156b43e09b2f9693ea6db2ab3535?fid=657587317-250528-645810261561365&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-yP%2BuyxCFv117yzeJAbdXcyfW0X0%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-28"
 	
 

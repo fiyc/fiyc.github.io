@@ -226,7 +226,7 @@ categories:
 
 
 
-[1]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_1.png?raw=true "图3-1 一个简单的环境结构"
-[2]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_2.png?raw=true "图3-2"
-[3]: https://github.com/fiyc/StaticResource/blob/master/SICP_P_3_3.png?raw=true "图3-3"
+[1]: https://thumbnail10.baidupcs.com/thumbnail/3b723424b76815923ffb8d18037c07d2?fid=657587317-250528-895640736408586&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-qng7ofLfbzmRY%2Bx8SJ1%2B%2BiPKJwE%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-1 一个简单的环境结构"
+[2]: https://thumbnail10.baidupcs.com/thumbnail/ced3e99970d62b545df7b8e9d8d79b57?fid=657587317-250528-756275662879536&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-T27ZIfYrHNavkaE53v2GSbthsXs%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-2"
+[3]: https://thumbnail10.baidupcs.com/thumbnail/8a97b66da83e81b8ea2b61046dc5bf86?fid=657587317-250528-93557199735014&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-FrXG%2BeuffWWUGBGlzSqu%2BSnWofU%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video "图3-3"
 
