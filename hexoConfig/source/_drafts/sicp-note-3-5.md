@@ -344,13 +344,54 @@ s[n] = 2^n
 流方法极富有启发性, 因为借助于它去构造系统时, 所用的模块划分方式可以与采用赋值、围绕着状态变量组织系统的方式不同. 例如, 我们可以将整个的时间序列(或者信号)作为关注的目标, 而不是去关注有关状态变量在各个时刻的值.
 
 #### 系统地将迭代操作方式表示为流过程
+回忆之前1.1.7节的平方根过程. 那里的思想就是生成出一个序列, 其元素是x的平方根的一个比一个更好的猜测值, 采用的方法是反复应用一个改进猜测的过程:
+```lisp
+(define (sqrt-improve guess x)
+	(average guess (/ x guess)))
+```
 
+在原来的`sqrt`过程里, 我们用某个状态变量的一系列值表示这些猜测. 换一种方式, 我们也可以生成一个无穷的猜测序列, 从初始猜测1开始:
+
+```lisp
+(define (sqrt-stream x)
+	(define guesses
+		(cons-stream 1.0
+			         (stream-map (lambda (guess)
+						           (average guess (/ x guess)))
+						         guesses)))
+	guesses)
+```
+
+我们可以按照同样的方式处理生产π的近似值, 这一过程基于下面的交替级数:
+```lisp
+π/4 = 1 - 1/3 + 1/5 - 1/7 ...
+
+(define (pi-summands n)
+	(cons-stream (/ 1.0 n)
+		         (stream-map - (pi-summands (+ n 2)))))
+
+(define pi-stream
+	(scale-stream (partial-sums (pi-summands 1)) 4))
+```
 #### 练习3.63
 
 #### 练习3.64
-
+```lisp
+(define (stream-limit s num)
+	(if (< (abs (stream-car s)
+	            (stream-car (stream-cdr s))) 
+	       num)
+		(stream-car (stream-cdr s))
+		(stream-limit (stream-cdr s) num)))
+```
 #### 练习3.65
-
+```lisp
+(define (ln-summands n)
+	(cons-stream (/ 1.0 n)
+	             (stream-map - (ln-summands (+ n 1)))))
+				 
+(define ln-stream (partial-sums (ln-summands 1)))
+```
 #### 序对的无穷流
 
 #### 练习3.66
