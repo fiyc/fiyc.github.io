@@ -237,14 +237,95 @@ categories:
 	
 (define fibs (fibgen 0 1))
 ```
+
+现在我们来思考构造一个素数的无穷流. 大致的想法是, 从整数2开始,因为这是第一个素数. 为了得到其余的素数, 就需要从其余的整数中过滤掉2的所有倍数, 这样就留下了一个从3开始的流, 而3也就是下一个素数. 现在我们再从这个流的后面部分过滤掉所有3的倍数, 这样就留下一个以5开头的流, 而5又是下一个素数.  
+
+该过程可描述如下: 对流S做筛选就是形成一个流, 其中的第一个元素就是S的第一个元素, 得到其随后的元素的方式是从S的其余元素中过滤掉S的第一个元素的所有倍数, 而后再对得到的结果进行筛选. 代码如下:
+
+```lisp
+(define (sieve stream)
+	(cons-stream
+		(stream-car stream)
+		(sieve (stream-filter
+			     (lambda (x)
+					 (not (divisible? x (stream-car stream))))
+				 (stream-cdr stream)))))
+				 
+(define primes (sieve (integers-starting-from 2)))
+
+(stream-ref primes 50)
+233
+```
 #### 隐式地定义流
+上面的`integers`和`fibs`流是通过描述"生成"过程的方式定义的, 这种过程一个个地计算出流的元素. 描述流的另一种方式是利用延时求值隐式地定义流, 如下:
 
+```lisp
+(define ones (cons-tream 1 ones))
+```
+
+这里就好像在定义一个递归过程, 通过使用诸如`add-streams`的操作, 我们还可以做一些更有趣的事情. `add-streams`操作产生出两个给定流的逐对元素之和:
+
+```lisp
+(define (add-stream s1 s2)
+	(stream-map + s1 s2))
+```
+
+基于此, 我们可以如此定义整数流`integers`:
+
+```lisp
+(define integers (cons-stream 1 (add-steams ones integers)))
+```
+
+这样定义出的`integers`是一个流, 其首元素是1, 其余部分是`ones`与`integers`之和. 这样第二个元素就是1加上`integers`的第一个元素, 也就是2; 第三个元素就是1加上`integers`的第二个元素, 也就是3. 依次类推.  
+
+我们可以用同样的风格定义出斐波那契数:
+
+```lisp
+(define fibs
+	(cons-stream 0
+		(cons-stream 1
+			(add-streams (steam-cdr fibs)
+				         fibs))))
+```
 #### 练习3.53
+```lisp
+(define s (cons-stream 1 (add-streams s s)))
+```
 
+这个过程的第一位是1, 之后是由两个s的各项相加得到的流, 因此:
+```
+s[0] = 1
+s[1] = s[0] + s[0] = 2
+s[2] = s[1] + s[1] = 4
+...
+s[n] = 2^n
+```
 #### 练习3.54
-
+```lisp
+(define (mul-streams s1 s2)
+	(stream-map * s1 s2))
+	
+(define factorials
+	(cons-stream 1
+	             (mul-stream factorials
+					         (stream-cdr integers))))
+```
 #### 练习3.55
-
+```lisp
+;;这是自己想到的
+(define (partial-sums s)
+	(define (partial-itor items num)
+		(let ((next (+ num (stream-car items))))
+			(cons-stream next
+			             (partial-itor (stream-cdr items) next))))
+	(partial-itor s 0))
+	
+;;这是看了解题集的, 这个答案应该更符合书中的思路
+(define (partial-sums s)
+	(cons-stream (stream-car s)
+	             (add-streams (partial-sums s)
+				              (partial-sums (stream-cdr s)))))
+```
 #### 练习3.56
 
 #### 练习3.57
@@ -260,6 +341,7 @@ categories:
 #### 练习3.62
 
 ### 3.5.3 流计算模式的使用
+流方法极富有启发性, 因为借助于它去构造系统时, 所用的模块划分方式可以与采用赋值、围绕着状态变量组织系统的方式不同. 例如, 我们可以将整个的时间序列(或者信号)作为关注的目标, 而不是去关注有关状态变量在各个时刻的值.
 
 #### 系统地将迭代操作方式表示为流过程
 
