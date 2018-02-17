@@ -1,13 +1,12 @@
 ---
 title: JavaScript设计模式 - 构造器模式
-tags:
-  - JavaScript
-  - 设计模式
-categories:
-  - 阅读笔记
 date: 2018-02-17 11:27:57
+tags:
+	- JavaScript
+	- 设计模式
+categories:
+	- 阅读笔记
 ---
-
 
 在传统的面向对象的编程语言中, 构造函数是一种特殊的方法, 用于在分配了内存后初始化新创建的对象. 在JavaScript中, 几乎所有东西都是对象, 我们通常会对对象的构造感兴趣.
 
@@ -46,23 +45,23 @@ var value = newObject["somekey"];
 
 // Set properties
 Object.defineProperty( newObject, "someKey", {
-	value: "Hello World",
-	writable: true,
-	enumerable: true,
-	configurable: true
+		value: "Hello World",
+		writable: true,
+		enumerable: true,
+		configurable: true
 });
 
 // If the above feels a little difficult to read, a short-hand could be written as follows
 
 var defineProp = function ( obj, key, value){
-	var config = {
-		value: value,
-		writable: true,
-		enumerable: true,
-		configurable: true
-	};
+		var config = {
+				value: value,
+				writable: true,
+				enumerable: true,
+				configurable: true
+		};
 
-Object.defineProperty( obj, key, config );
+		Object.defineProperty( obj, key, config );
 };
 
 // To use, we then create a new empty "person" object
@@ -77,15 +76,15 @@ console.log( person );
 
 // 4. Object.defineProperties
 Object.defineProperties( newObject, {
-	"someKey": {
-		value: "Hello World",
-		writable: true
-	},
+		"someKey": {
+				value: "Hello World",
+				writable: true
+		},
 
-	"anotherKey": {
-		value: "Foo bar",
-		writable: false
-	}
+		"anotherKey": {
+				value: "Foo bar",
+				writable: false
+		}
 });
 
 ```
@@ -108,7 +107,6 @@ console.log( driver.topSpeed );
 
 
 ### 基本构造方法
-
 正如我们前面看到的, JavaScript不支持类的概念. 但是他支持对对象使用特殊的构造函数. 通过在调用构造函数时, 用一个简单的前缀`new`, 我们告诉JavaScript我们希望这个函数作为一个构造函数来创建一个新的对象, 这个对象包含了函数中声明的成员.  
 
 在构造函数中, 关键字`this`指向了被创建的对象本身. 一个基本的构造函数如下所示:
@@ -116,13 +114,13 @@ console.log( driver.topSpeed );
 ```javascript
 function Car( model, year, miles ){
 
-	this.model = model;
-	this.year = year;
-	this.miles = miles;
+		this.model = model;
+		this.year = year;
+		this.miles = miles;
 
-	this.toString = function () {
-		return this.model + " has done " + this.miles + " miles";
-	}
+		this.toString = function () {
+				return this.model + " has done " + this.miles + " miles";
+		}
 }
 
 // We can create new instances of the car
@@ -142,13 +140,13 @@ console.log( mondeo.toString() );
 
 ```javascript
 function Car( model, year, miles ){
-	this.model = model;
-	this.year = year;
-	this.miles = miles;
+		this.model = model;
+		this.year = year;
+		this.miles = miles;
 }
 
 Car.prototype.toString = function () {
-	return this.model + " has done " + this.miles + " miles";
+		return this.model + " has done " + this.miles + " miles";
 };
 ```
 
