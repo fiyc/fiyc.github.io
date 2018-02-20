@@ -1,0 +1,178 @@
+---
+title: 跨域问题解析
+tags:
+  - 跨域
+categories:
+  - 前端
+date: 2018-02-20 16:08:49
+---
+
+
+之前在项目中遇到跨域问题, 只是简单的搜索了下解决方案. 使用`jsonp`解决问题后并没有做深入的了解. 这次在[慕课网](https://www.imooc.com/video/16571)看到了关于跨域的课程, 觉得听完还是学到了一些东西, 因此这里专门做了一次记录.  
+
+<!-- more -->
+
+## 跨域产生的原因
+跨域问题简单的说, 就是发起一次`XHR(XMLHttpRequest)`请求时, 如果调用发与被调用方所在`域`不同, `浏览器`就认为这是一个跨域请求, 并对本次请求做出限制. 也就是说, 产生跨域问题必须要满足下面三个条件:  
+* XHR请求
+* 调用方与被调用方不同域
+* 浏览器会对跨域做限制
+
+同时我们也可以认清一点, 跨域问题是发送在浏览器端做的限制. 
+
+## 解决方案
+基于上面提到的跨域的三个条件, 我们的解决思路就可以从这三点入手. 只要使得这3个条件中的任意一个条件不满足, 跨域问题自然就可以得到解决.
+
+### 浏览器
+从浏览器端入手解决跨域问题, 也就是告诉浏览器, 不需要你去做跨域的处理啦. 这里我的环境是MaxOS下使用Chrome, 其他的系统或者浏览器的解决方案并没有做了解. 因为通过浏览器解除限制来解决跨域问题并不是一个合适的手段, 可能只会在调试时使用到.  
+
+1. 首先进入Chrome所在目录
+```
+$ cd /Applications/Google Chrome.app/Contents/MacOS/
+```
+
+2. 备份原有的启动文件
+```
+$ sudo mv "Google Chrome" startbackup
+```
+
+3. 创建新的启动文件, 在其中加入参数
+```
+$ $ sudo printf '#!/bin/bash\ncd "/Applications/Google Chrome.app/Contents/MacOS"\n"/Applications/Google Chrome.app/Contents/MacOS/startbackup" --disable-web-security --user-data-dir "$@"\n' > Google\ Chrome
+```
+
+4. 为新的启动文件添加执行权限
+```
+$ sudo chmod u+x "Google Chrome"
+```
+
+这种方式的局限性很大, 因为它必须要在客户端进行修改. 在实际生产环境中, 让每个用户去修改自己的浏览器是不现实的. 因此这种方式只适用于开发者本身调试时使用.
+
+### jsonp
+通过jsonp这种方式来解决跨域问题是我之前使用的一种方式, 他的思路就是针对上面三个条件的`XHR请求`这一点. 通过设置ajax请求类型为jsonp, 我们将请求的类型由`XHR`变为了`script`, 自然也就没有了跨域的问题.  
+
+实现jsonp的原理是, 调用方与被调用方通过约定一个js函数名(默认通过callback参数传递), 被调用方返回的信息由原本的json对象变为了执行这个函数的js脚本, 入参就是原本的json对象. 调用方在请求完成之后, 在页面中添加这一段返回的脚本, 执行获取到结果后再删除这一段脚本.  
+
+我们通常的实现代码如下:
+```
+//客户端
+$.ajax({
+	url: xxx,
+	type: jsonp,
+	success: function(data){
+		...
+	}
+});
+
+//服务器端 c#
+var result = GetResult();
+var callback = context.HttpContext.Request["callback"];
+var buffer = string.Empty;
+
+var serializer = new JavaScriptSerializer();
+if(callback != null)
+{
+	buffer = string.Format("{0}({1})", callback, serializer.Serialize(result));
+}
+else
+{
+	buffer = serializer.Serialize(result);
+}
+
+context.Httpcontext.Response.Write(buffer);
+```
+
+在上面的代码中, `jQury`已经为我们封装了一些针对jsonp的操作, 包括创建script标签并将标签引用地址设置为我们的请求地址, 赋值等操作. 如果有兴趣的可以去看一下源码.  
+
+当然, jsonp存在着他自身的缺陷, 主要有下面几点:  
+* 需要服务器端同时支持jsonp  
+
+在上面的代码例子里可以看到, 当请求为jsonp时, 服务器端需要修改返回数据体的格式为一段js脚本. 但是在实际情况下, 一些我们请求的地址并不一定受我们控制, 它可能并不支持jsonp. 这种情况下, jsonp就不适用了.  
+
+* 由于jsonp的实质是动态添加script标签, 因此它只支持`GET`请求.
+* 并不能使用`XHR`的一些特性
+
+### 被调用方修改返回头
+我们可以在被调用方的返回头信息中, 标注说明支持跨域, 具体的头信息如下:
+
+```
+{
+	Access-Control-Allow-Origin: "*",
+	Access-Control-Allow-Methods: "GET"
+}
+
+```
+
+这样, 就可以支持`简单请求`的跨域问题.
+
+#### 简单请求与非简单请求
+上面提到了一个概念叫做`简单请求`, 那么与之对应的就存在`非简单请求`.  
+
+简单请求需要满足以下两个条件:
+* 请求方式为: HEAD, GET, POST
+* 请求头中`Content-Type`需要是: `application/x-www-form-urlencoded`, `multipart/form-data`, `text/plain`之一
+
+不满足上述两点的请求, 则为非简单请求.  
+
+简单请求与非简单请求的差别在于, 非简单请求在发送我们希望的请求前, 会先发送一个`OPTIONS`请求, 向服务器进行验证. 只有验证通过以后才会继续请求.
+
+#### 带cookie的跨域请求
+上面我们提到被调用方通过在返回头信息中添加`Access-Control-Allow-Origi: *`来支持跨域请求, 但是如果跨域请求需要带上`cookie`信息, 那么此时服务器端的返回头信息就需要进行修改.  
+1. 首先`Access-Control-Allow-Origi`不能使用`*`来匹配所有的请求, 而需要指定被调用方的域名.  
+2. 返回头中, `Access-Control-Allow-Credentials`需要设置为true.  
+
+针对上面第一点, 我们可能会发现一个问题, 那就是如果写死调用方域名的话, 被调用方岂不是只支持一个指定调用方的跨域请求了. 为了解决这个问题, 我们可以从请求头中的`Origin`获取到调用方的域名, 然后将这个值作为`Access-Control-Allow-Origin`.
+
+### 被调用方Nginx配置 
+这里是通过修改被调用方的服务器配置来实现添加返回头信息  
+
+1. Nginx配置引入自定义配置  
+```shell
+include vhost/*.conf
+```
+
+2. 添加配置文件 `vhost/fiyc.space.conf`  
+```
+server{
+	listen 80;
+	server_name fiyc.spance;
+	
+	location /{
+		proxy_pass http://localhsot:8080/;
+		
+		add_header Access-Control-Allow-Methods *;
+		add_header Access-Control-Max-Age 3600;
+		add_header Access-Control-Allow-Credentials true;
+		
+		#获取请求头中的origin
+		add_header Access-Control-Allow-Origin $http_origin;
+		
+		#获取请求头中的自定义headers
+		add_header Access-Control-Request-Headers $http_access_control_request_headers;
+		
+		#处理预检命令
+		if ($request_method = OPTIONS){
+			return 200;
+		}
+	}
+}
+```
+
+
+### 调用方隐藏跨域
+这里的思路是修改调用方服务器, 将一个本地请求路径转发到目标服务器地址, 下面是Nginx的配置内容
+
+```
+server{
+	listen 80;
+	server_name fiyc.space
+	
+	location /{
+		proxy_pass http://locahost:8081/;
+	}
+	
+	location /ajaxserver{
+		proxy_pass http://localhost:8080/test/
+	}
+}
+```
