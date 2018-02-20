@@ -1,8 +1,10 @@
 ---
 title: npm设置国内源
 date: 2017-11-17 10:11:33
-tags:npm
-categories:环境部署
+tags:
+	- npm
+categories:
+	- 前端
 ---
 
 这里记录一下npm更改源的方法, 原文来自[这里](http://riny.net/2014/cnpm), 这里只是做了简单的笔记.  

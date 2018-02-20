@@ -4,7 +4,7 @@ date: 2018-02-13 23:29:05
 tags:
 	- SICP
 categories:
-	- 阅读笔记
+	- 编程范式
 ---
 
 

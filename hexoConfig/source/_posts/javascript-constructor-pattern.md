@@ -4,7 +4,7 @@ tags:
   - JavaScript
   - 设计模式
 categories:
-  - 阅读笔记
+  - 前端
 date: 2018-02-17 11:27:57
 ---
 
