@@ -1,0 +1,143 @@
+---
+title: 拖拽上传文件实现过程记录
+date: 2018-03-30 13:30:55
+tags:
+	- node
+	- 文件上传
+categories:
+	- 前端
+---
+
+## 前言
+最近写了一个文件拖拽上传的页面, 因为之前从来没有实现过文件拖拽的功能, 感觉还是蛮好玩的. 同时, 在整个过程中也遇到了一些问题, 在这里专门做一个完整的记录.  
+
+<!-- more -->
+
+## 遇到的问题
+* express 实现文件上传
+* 文件拖拽页面实现
+* ajax异步上传文件
+
+
+
+
+## express 实现文件上传
+说来着还是第一次尝试使用`node` + `express`作为后台, 关于文件上传的功能, 网上直接找了下实现方案, 最后确定使用`multer`中间件来实现上传文件功能. 这个过程其实还是蛮顺利的, 唯一需要注意的是`multer`要求请求的`Content-Type`必须是`multipart/form-data`, 这在[npm](https://www.npmjs.com/package/multer)上有这说明:
+> NOTE: Multer will not process any form which is not multipart (multipart/form-data).
+
+当然这一点也导致我后面遇到了问题, 这个在后面说到`ajax异步上传文件`时再说.  
+
+使用`multer`的代码很少, 大致过程如下:  
+
+**安装multer包**
+```
+$ npm install multer --save
+```
+
+**在route中指定请求接受的文件**
+```
+const multer = require('multer');
+const upload = multer({storage: storage});
+
+const express = require('express');
+const router = express.Router();
+router.post('/upload', upload.single('filename'), controller.upload);
+
+module.exports = router;
+```
+
+**在对应的回调函数中获取到文件信息**
+```
+module.exports = {
+	upload: function(req, res, next){
+		//req.file 即上传的文件
+	}
+}
+```
+至此, `http://localhost:3000/uplaod`就可以接受文件上传了.
+
+
+
+## 文件拖拽页面实现
+拖拽的实现其实主要就是对于几个拖拽事件的使用, 这里我用到了
+
+* drop
+* dragenter
+* dragleave
+
+这三个事件.  
+
+不过在写的时候发现别人一种比较有趣的绑定事件方法, 之前从来不知道还可以这样用. 如下: 
+
+```
+var preventDefaultOperation = {
+	dragleave: functioni(e){
+		e.preventDefault();
+	},
+	drop: function(e){
+		e.preventDefault();		
+	},
+	dragenter: function(e){
+		e.preventDefault();
+	},
+	dragover: function(e){
+		e.preventDefault();
+	}
+}
+
+$(document).on(preventdefaultoperation);
+```
+
+上面的代码取消了事件的默认动作, 我认为比较有趣的是直接在`on`函数中传递了一个对象, 又学到了一点.  
+
+之后就是自己实现具体事件触发时的逻辑:
+```
+var dragContent = document.getElementById('dragContent');
+dragContent.addEventListener('drop', function (e) {
+	drapHander.dragLeave(dragContent);
+		if (e.dataTransfer.files.length > 0) {
+			for (var i = 0; i < e.dataTransfer.files.length; i++){
+				// files.push(e.dataTransfer.files[i]);
+				fileHander.push(e.dataTransfer.files[i]);
+			}
+		}
+	});
+
+dragContent.addEventListener('dragenter', function (e) {
+	drapHander.dragEnter(dragContent);
+});
+
+dragContent.addEventListener('dragleave', function (e) {
+	drapHander.dragLeave(dragContent);
+});
+```
+上面的三个事件中, `drop`在拖动文件进入对象中并释放鼠标时触发, 因此在这个事件中我通过`e.dataTransfer.files`来获取拖动的文件. `dragenter`与`dragleave`分别在拖动进入到对象以及离开对象时触发, 这里就只是做了样式上的改变.
+
+
+
+## ajax异步上传文件
+在最开始我是使用`form`通过`ajaxForm`来实现异步上传的. 这种方式的话要记得要把`form`的`enctype`属性设置成`multipart/form-data`, 也就是`multer`文档中说的那样, 否则文件无法被中间件处理.  
+
+当我准备完成多个文件上传的时候, 我发现直接使用`form`有点困难. 原因是我不知道该如何动态的向`form`中添加文件. 在网上搜了很多, 貌似`<input type="file">`也不允许通过js去修改它的值. 于是这里我准备换一种方式, 通过`formData`对象来构造我的请求数据, 然后通过`ajax`来发送请求. 实现的代码如下:
+
+```
+var submitFile = function(file){
+	var formData = new FormData();
+	formData.append('filename', file, file.name);
+	
+	var xhr = new XMLHttpRequest();
+	xhr.open('POST', '/upload', true);
+	
+	xhr.onreadystatechange = function(){
+		if(xhr.readyState === 4){
+			var res = JSON.parse(xhr.resposeText);
+		}
+	}
+}
+```
+
+这里需要重点说的是, 由于我始终记得需要设置`Content-Type`, 所以上面的代码中我原本加了设置header的代码, 但是最后发现在后台无法获取到文件. 最后发现是我自己设置的`xhr.setRequestHeader('Content-type', 'multipart/form-data')`引起的, 直接让xhr来处理我的请求格式就可以了.
+
+
+## 尾
+虽然总的来说, 这次实现的功能很简单, 但是还是从中了解了一些以前所不熟悉的东西. 除了上面提到的一些, 我还添加了一些上传文件的展示以及针对excel文件转换成sql的功能, 代码可以在[这里](https://github.com/fiyc/front-end/tree/master/DragUpoadFile)看到.
