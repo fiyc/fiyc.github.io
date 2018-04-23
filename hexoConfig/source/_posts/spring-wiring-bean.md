@@ -1,5 +1,5 @@
 ---
-title: spring-wiring-bean
+title: Spring 装配bean基础
 tags:
   - spring
 categories:
@@ -12,7 +12,8 @@ date: 2018-04-23 23:06:29
 > 创建应用对象之间协作关系的行为通常称为`装配(wiring)`, 这也是依赖注入的本质.  
 
 本文记录了`spring`在装配bean时的一些基本基础知识.
-
+	
+<!-- more -->
 ## Spring配置的可选方案
 Spring提供了三种主要的装配机制:  
 * 在XML中进行显示配置
@@ -165,3 +166,11 @@ public class CDPlayerConfig{
 
 
 
+
+## 本文注解总结
+* @Component 定义一个组件, spring为其创建一个bean, 可定义bean名
+* @Named 可替代@Component
+* @ComponentScan 启用扫描, 默认扫描与配置类相同的包, 可指定多个包或类
+* @Autowired 自动装配
+* @Configuration 表明配置类
+* @Bean 声明bean
