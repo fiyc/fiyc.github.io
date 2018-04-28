@@ -83,3 +83,47 @@ public @interface Cold{}
 ### 11.运行时注入 *P88*
 
 ## 面向切面
+### 12. AOP术语 *P103*
+* 通知(Advice)
+* 连接点(Join point)
+* 切点(Poincut)
+* 切面(Aspect)
+* 引入(Introduction)
+* 织入(Weaving)
+
+### 13. 切点表达式 *P109*
+`execution(* concert.Performance.perform(..)) && withing(concert.*)`
+
+
+### 14. 定义切面 *P110*
+* @Aspect 声明这是一个切面
+* @After 目标方法返回或抛出异常时通知
+* @AfterReturning 目标方法返回时通知
+* @AfterThrowing 目标方法抛出异常时通知
+* @Around 通知方法将目标方法封装
+* @Before 目标方法调用之前执行
+
+### 15. 启动自动代理 *P113*
+* @EnableAspectJAutoProxy
+```
+@Configuration
+@EnableAspectJAutoProxy
+@ComponentScan
+public class ConcertConfig{
+	
+	@Bean
+	public Audience audience(){
+		return new Audience();
+	}
+}
+```
+
+### 16. 环绕通知 *P114*
+```
+@Around("performance()")
+public void watchPerformance(ProceedingJoinPoint jp){
+	...
+	jp.proceed();
+	...
+}
+```
