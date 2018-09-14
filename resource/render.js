@@ -36,6 +36,11 @@ function init() {
             date: "2017-11-17 10:11:33"
         },
         {
+            title: "Python装饰器理解",
+            url: "article/python-derator.html",
+            date: "2018-09-14 11:22"
+        },
+        {
             title: "Spring 装配bean基础",
             url: "article/spring-wiring-bean.html",
             date: "2018-04-23 23:06:29"
