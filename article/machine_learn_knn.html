@@ -1,0 +1,238 @@
+<html>
+<meta charset="utf-8" />
+<title>机器学习实战 k-近邻算法</title>
+<link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github-gist.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../resource/common.css" type="text/css" />
+<link rel="stylesheet" href="../resource/article.css" type="text/css" />
+
+<body>
+    <div class="main-container">
+        <h2 id="-">前言</h2>
+<p>本文是在读《机器学习实战》时, 针对<code>k-近邻算法</code>这一节做的笔记. 对于从未接触机器学习的人来说, 这一篇文章可以作为一个简单的入门指导. 让我们对所谓的机器学习是如何工作的有一些简单的了解.</p>
+<!-- more -->
+
+<h2 id="k-"><em>k</em>-近邻算法概述</h2>
+<p>简单的说, <em>k</em>-近邻算法采用测量不同特征值之间的距离方法进行分类.</p>
+<ul>
+<li>优点: 精度高, 对异常值不敏感, 无数据输入假定</li>
+<li>缺点: 计算复杂度高, 空间复杂度高</li>
+<li>适用数据范围: 数值型和标称型</li>
+</ul>
+<h3 id="-">一般流程</h3>
+<ol>
+<li>收集数据: 可以使用任何方法</li>
+<li>准备数据: 距离计算所需要的数值, 最好是结构化的数据格式</li>
+<li>分析数据: 可以使用任何方法</li>
+<li>训练算法: 此步骤不适用于k-近邻算法</li>
+<li>测试算法: 计算错误率</li>
+<li>使用算法: 首先需要输入样本数据和结构化的输出结果, 然后运行k-近邻算法判定输入数据分别属于哪个分类, 最后应对计算出的分类执行后续的处理.</li>
+</ol>
+<h3 id="-">工作原理</h3>
+<blockquote>
+<p>存在一个样本数据集合, 也称为训练样本集, 并且样本集中每个数据都存在标签, 即我们知道样本集中每一数据与所属分类的对应关系. 当我们输入没有标签的新数据后, 将新数据的每个特征与样本集中数据对应的特征进行比较, 然后算法提取样本集中特征最相似数据(最近邻)的分类标签. 一般来说, 我们只选择样本数据集中前k个最相似的数据, 这也是<code>k-近邻算法</code>中k的出处, 通常k是不大于20的整数. 最后, 选择k个最相似数据中出现次数最多的分类, 作为新数据的分类.  </p>
+</blockquote>
+<p>以上是书中的原文, 描述了这一算法的工作原理. 在这里我用自己的理解来做一下描述.  </p>
+<p>假设存在一批关于程序员技术能力的训练数据集, 这一批数据存在2个特征, <code>每周代码量</code>与<code>每周博客量</code>. 如下图:</p>
+<table>
+<thead>
+<tr>
+<th>每周代码量</th>
+<th>每周博客量</th>
+<th>技术评价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>100</td>
+<td>0</td>
+<td>初级</td>
+</tr>
+<tr>
+<td>200</td>
+<td>0</td>
+<td>初级</td>
+</tr>
+<tr>
+<td>300</td>
+<td>1</td>
+<td>中级</td>
+</tr>
+<tr>
+<td>500</td>
+<td>0</td>
+<td>中级</td>
+</tr>
+<tr>
+<td>200</td>
+<td>3</td>
+<td>高级</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>1</td>
+<td>高级</td>
+</tr>
+</tbody></table>
+<p><em>注: 以上数据只是为了说明原理, 不具有代表意义</em>  </p>
+<p>在上述表格中, 最后一列为训练样本的标签, 也可以说是分类. 而我们的算法最终的目的也就是将我们的输入参数指向某一个标签.  </p>
+<p>现在假设我们有了一条输入参数:</p>
+<table>
+<thead>
+<tr>
+<th>每周代码量</th>
+<th>每周博客量</th>
+<th>技术评价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>400</td>
+<td>0</td>
+<td>?</td>
+</tr>
+</tbody></table>
+<p>我们希望知道这个程序员的技术评价. 我们的做法是, 将这一条输入参数, 与训练样本中的每一条记录做<code>距离计算</code>(后面会提到如何计算), 然后按照距离升序排序, 取出前<code>k</code>条. 最后使用取出的数据中, 数量最多的一种标签.</p>
+<h4 id="-">距离计算</h4>
+<p><em>k</em>-近邻算法的距离计算, 其实是可很容易理解的问题. 回忆一下我们上学时学过的平面坐标系:  </p>
+<p>假设在坐标系中存在两个点 <code>A(x1, y1)</code> 与 <code>B(x2, y2)</code>, 求这两个点的距离.  </p>
+<p><code>Math.sqrt((x1-x2)^2 + (y1-y2)^2)</code>  </p>
+<p>如果是一个三维坐标系的两个坐标 <code>A(x1, y1, z1)</code> 与 <code>B(x2, y2, z2)</code>呢.  </p>
+<p><code>Math.sqrt((x1-x2)^2 + (y1-y2)^2 + (z1-z2)^2)</code>  </p>
+<p>同理, 在我们计算输入数据与样本数据的距离时, 也是针对每一个特征计算.  </p>
+<p>但是有一点需要注意的时, 由于每一列特征值意义不同, 如果按照原值计算, 可能对计算结果造成误差. 因此我们通常会做一个训练样本的归一操作. 将特征的数值转换为0-1的范围内.</p>
+<h4 id="-">归一化数值</h4>
+<p>下面的公式可以将任意取值范围的特征值转化为0到1区间内的值<br><code>newValue = (oldValue - min) / (max - min)</code>  </p>
+<p>其中<code>min</code>和<code>max</code>分别是数据集中的最小特征值和最大特征值.  </p>
+<p>比如上面提到的程序员样本数据, 进行归一化数值后, 得到如下表格:</p>
+<table>
+<thead>
+<tr>
+<th>每周代码量</th>
+<th>每周博客量</th>
+<th>技术评价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>初级</td>
+</tr>
+<tr>
+<td>0.1111</td>
+<td>0</td>
+<td>初级</td>
+</tr>
+<tr>
+<td>0.2222</td>
+<td>0.3333</td>
+<td>中级</td>
+</tr>
+<tr>
+<td>0.4444</td>
+<td>0</td>
+<td>中级</td>
+</tr>
+<tr>
+<td>0.1111</td>
+<td>0.3333</td>
+<td>高级</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>高级</td>
+</tr>
+</tbody></table>
+<h2 id="-">案例分析 - 识别手写数字</h2>
+<p>这里我们将使用<em>k</em>-近邻算法来完成一个识别手写数字的例子. 这里使用到的图片资源可以在原书代码中找到. 也可以去<a href="https://pan.baidu.com/s/1qZYBdMW">这里</a>下载  </p>
+<p>在这里我们使用文本文件来表示图片, 首先是一个将图片转换为向量的函数</p>
+<pre><code class="language-python"><span class="hljs-comment"># -*- coding: utf-8 -*-</span>
+<span class="hljs-keyword">from</span> numpy <span class="hljs-keyword">import</span> *
+<span class="hljs-keyword">from</span> os <span class="hljs-keyword">import</span> listdir
+<span class="hljs-keyword">import</span> operator
+<span class="hljs-string">'''
+- 机器学习实战
+- k-近邻算法
+- 手写识别系统
+'''</span>
+
+<span class="hljs-comment"># 将图像转换为测试向量</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">img2vector</span><span class="hljs-params">(filename)</span>:</span>
+    returnVect = zeros((<span class="hljs-number">1</span>, <span class="hljs-number">1024</span>))
+    fr = open(filename)
+
+    <span class="hljs-comment"># 这里由于图片资源为32*32, 因此通过两个循环, 将图片的每一点作为特征, 生成一个长度为(1, 1024)的矩阵</span>
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(<span class="hljs-number">32</span>):
+        lineStr = fr.readline()
+        <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> range(<span class="hljs-number">32</span>):
+            returnVect[<span class="hljs-number">0</span>, <span class="hljs-number">32</span> * i + j] = int(lineStr[j])
+
+    <span class="hljs-keyword">return</span> returnVect</code></pre>
+<p>我们的<em>k</em>-近邻算法如下所示, 实现了前文描述的逻辑</p>
+<pre><code class="language-python">'''
+获取输入数据的类型
+
+inX: 输入数据特征
+dataSet: 样本数据特征
+labels: 样本数据标签
+k: 选取前k个最近数据
+'''
+def classify0(inX, dataSet, labels, k):
+<span class="hljs-code">    dataSetSize = dataSet.shape[0]</span>
+<span class="hljs-code">    diffMat = tile(inX, (dataSetSize, 1)) - dataSet</span>
+<span class="hljs-code">    sqDiffMat = diffMat**2</span>
+<span class="hljs-code">    sqDistances = sqDiffMat.sum(axis=1)</span>
+<span class="hljs-code">    distances = sqDistances**0.5</span>
+<span class="hljs-code">    sortedDisIndicies = distances.argsort()</span>
+<span class="hljs-code">    classCount = {}</span>
+<span class="hljs-code">    for i in range(k):</span>
+<span class="hljs-code">        voteIlabel = labels[sortedDisIndicies[i]]</span>
+<span class="hljs-code">        classCount[voteIlabel] = classCount.get(voteIlabel, 0) + 1</span>
+
+<span class="hljs-code">    sortedClassCount = sorted(classCount.iteritems(),</span>
+<span class="hljs-code">                              key=operator.itemgetter(1), reverse=True)</span>
+<span class="hljs-code">    return sortedClassCount[0][0]</span></code></pre>
+<p>最后我们使用一个测试函数, 验证我们的算法准确率</p>
+<pre><code class="language-python">def handwritingClassTest():
+    hwLabels = []
+    tranDataPath = <span class="hljs-string">'/Users/yif/Desktop/machinelearninginaction/Ch02/digits/trainingDigits'</span>  <span class="hljs-comment"># 这里是我们存放样本数据的目录</span>
+    testDataPath = <span class="hljs-string">'/Users/yif/Desktop/machinelearninginaction/Ch02/digits/testDigits'</span>  <span class="hljs-comment"># 这里是我们存放测试数据的目录</span>
+    trainingFifleList = listdir(tranDataPath)
+    <span class="hljs-keyword">m</span> = len(trainingFifleList)
+    trainingMat = zeros((<span class="hljs-keyword">m</span>, <span class="hljs-number">1024</span>))
+
+    <span class="hljs-keyword">for</span> i in range(<span class="hljs-keyword">m</span>):
+        fileNameStr = trainingFifleList[i]
+        fileStr = fileNameStr.<span class="hljs-keyword">split</span>(<span class="hljs-string">'.'</span>)[<span class="hljs-number">0</span>]
+        classNumStr = <span class="hljs-keyword">int</span>(fileStr.<span class="hljs-keyword">split</span>(<span class="hljs-string">'_'</span>)[<span class="hljs-number">0</span>])
+        hwLabels.append(classNumStr)
+        trainingMat[i, :] = img2vector(<span class="hljs-string">'%s/%s'</span> % (tranDataPath, fileNameStr))
+
+    testFileList = listdir(testDataPath)
+    testLength = len(testFileList)
+    errorCount = <span class="hljs-number">0</span>.<span class="hljs-number">0</span>
+
+    <span class="hljs-keyword">for</span> i in range(testLength):
+        firlNameStr = testFileList[i]
+        fileStr = firlNameStr.<span class="hljs-keyword">split</span>(<span class="hljs-string">'.'</span>)[<span class="hljs-number">0</span>]
+        classNumStr = <span class="hljs-keyword">int</span>(fileStr.<span class="hljs-keyword">split</span>(<span class="hljs-string">'_'</span>)[<span class="hljs-number">0</span>])
+
+        vectorUnderTest = img2vector(<span class="hljs-string">'%s/%s'</span> % (testDataPath, firlNameStr))
+        classifierResult = classify<span class="hljs-number">0</span>(vectorUnderTest, trainingMat, hwLabels, <span class="hljs-number">3</span>)
+
+        <span class="hljs-keyword">print</span> <span class="hljs-string">"classifier result is: %d, real result is: %d"</span> % (classifierResult, classNumStr)
+
+        <span class="hljs-keyword">if</span>(classifierResult != classNumStr):
+            errorCount += <span class="hljs-number">1.0</span>
+
+    <span class="hljs-keyword">print</span> <span class="hljs-string">"\nthe total number of error is: %d"</span> % errorCount
+    <span class="hljs-keyword">print</span> <span class="hljs-string">"\nthe total error rate is: %f"</span> % (errorCount / float(testLength))
+
+
+<span class="hljs-keyword">if</span> (__name_<span class="hljs-number">_</span> == <span class="hljs-string">'__main__'</span>):
+    handwritingClassTest()</code></pre>
+<h2 id="-">总结</h2>
+<p><em>k</em>-近邻算法是分类数据最简单有效的算法. 它是基于实例的学习, 使用算法时我们必须有接近实际数据的训练样本数据. 同时, 这个算法必须保存全部数据集, 如果训练数据集很大, 则会占用大量存储空间. 此外, 由于必须对数据集中的每个数据计算距离值, 实际使用时可能非常耗时.  </p>
+<p><em>k</em>-近邻算法的另一个缺陷是它无法给出任何数据的基础结构信息, 因此我们也无法知晓平均实例样本和典型实例样本具有什么特征.</p>
+
+    </div>
+</body>
+</html>
