@@ -1,0 +1,257 @@
+<html>
+<meta charset="utf-8" />
+<title>实现简单的神经网络</title>
+<link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github-gist.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../resource/common.css" type="text/css" />
+<link rel="stylesheet" href="../resource/article.css" type="text/css" />
+
+<body>
+    <div class="main-container">
+        <h1 id="-">实现简单的神经网络</h1>
+<blockquote>
+<p>这是我的第一次机器学习, 学习内容是来自<a href="https://www.imooc.com/video/14375" title="机器学习-实现简单神经网络">慕课网</a></p>
+</blockquote>
+<!-- more -->
+<h3 id="1-">1.分类算法的总体描述</h3>
+<h4 id="-">神经元的数学表示</h4>
+<p>权重 <code>W = [W1, W2 ... Wn]</code><br>神经信号(训练数据) <code>X = [X1, X2 ... Xn]</code><br>进入神经核的信息 <code>Z=W1*X1 + W2*X2 + ... + Wn*Xn</code>  </p>
+<h4 id="-">激活函数(步调函数)</h4>
+<p>这个函数以前面进入神经核的信息为入参, 存在一个<code>阈值</code>, 如果入参大于阈值则为1, 否则为-1  </p>
+<pre><code>       <span class="hljs-string">|-  1 if z &gt;= O</span>
+$(z) = <span class="hljs-string">|</span>
+       <span class="hljs-string">|-  -1 otherwise</span></code></pre><h4 id="-">一些数学运算概念</h4>
+<ul>
+<li><p>点积<br>也就是上面提到的z的计算过程 <code>z = w0*x0 + ... + wn*xN</code><br>例如:  </p>
+<pre><code>[<span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span>] * [<span class="hljs-number">4</span> <span class="hljs-number">5</span> <span class="hljs-number">6</span>] = <span class="hljs-number">1</span>*<span class="hljs-number">4</span> + <span class="hljs-number">2</span>*<span class="hljs-number">5</span> + <span class="hljs-number">3</span>*<span class="hljs-number">6</span> = <span class="hljs-number">32</span>  </code></pre></li>
+<li><p>矩阵的行转列  </p>
+<pre><code>|<span class="hljs-number">1</span> <span class="hljs-number">2</span>|      |<span class="hljs-number">1</span> <span class="hljs-number">3</span> <span class="hljs-number">5</span>|
+|<span class="hljs-number">3</span> <span class="hljs-number">4</span>| -&gt;   |<span class="hljs-number">2</span> <span class="hljs-number">4</span> <span class="hljs-number">6</span>|
+|<span class="hljs-number">5</span> <span class="hljs-number">6</span>|</code></pre></li>
+</ul>
+<h3 id="2-">2. 感知器分类算法</h3>
+<h4 id="-">感知器数据分类算法步骤</h4>
+<p>权重向量W, 训练样本X</p>
+<ul>
+<li>1.把权重向量初始化为0, 或把每个分量初始化为[0,1]间的任意小数</li>
+<li>2.把训练样本输入感知器, 得到分类结果(-1 或 1)</li>
+<li>3.根据分类结果更新权重向量</li>
+</ul>
+<h4 id="-">步调函数与阈值</h4>
+<p>这里提到了一个简化步调函数的操作  </p>
+<p>将阈值Ø 加入权重向量来简化操作, <code>w0 = -Ø and x0 = 1</code>  </p>
+<p><code>z= w0*x0 + w1*x1 + ... + wn*xn</code>  </p>
+<p>这样就是需要判断<code>if z &gt;= 0 1 else -1</code></p>
+<h4 id="-">权重更新算法</h4>
+<ul>
+<li>W(j) = W(j) + △W(j)</li>
+<li>△W(j) = η * (y - y&#39;) * X(j)</li>
+<li>η表示学习率, 是一个[0,1]间的y一个小数</li>
+<li>y是输入样本的正确分类, y&#39;是感知器计算出来的分类</li>
+</ul>
+<h4 id="-">权重更新算法示例</h4>
+<p>假设: W = [0 0 0], X = [1 2 3], η = 0.3, y = 1, y&#39; = -1  </p>
+<p>得到: </p>
+<ul>
+<li>△W(0) = 0.3 * 2 * 1 = 0.6,   W(0) = 0.6</li>
+<li>△W(1) = 0.3 * 2 * 2 = 1.2,   W(1) = 1.2</li>
+<li>△W(2) = 0.3 * 2 * 3 = 1.8,   W(2) = 1.8  </li>
+</ul>
+<p>更新后的权重向量 W = [0.6 1.2 1.8]</p>
+<h4 id="-">感知器算法适用范围</h4>
+<p>只适用于可以线性区分的问题, 如下图的左边<br><img src="https://thumbnail10.baidupcs.com/thumbnail/cff844604d98fbcc10bd7c5ec66d52a0?fid=657587317-250528-153562805848916&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-zPYNPoEZRoVflmLt0KsedfLeq0E%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video" alt="感知器算法适用范围" title="感知器适用范围"></p>
+<h4 id="-">感知器算法总结</h4>
+<p>总的来说, 感知器算法就是适用训练样本经过权重向量计算后, 只用得到的结果与阈值进行比较, 如果通过则发送信号; 否则则修改权重向量. 通过大量的训练样来不断的改善我们的权重向量. 如下图  </p>
+<p><img src="https://thumbnail10.baidupcs.com/thumbnail/04932df88031f7bac2f532bf4adc75c4?fid=657587317-250528-669287250906211&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-biR7qR%2BvamRr%2BuzYfCIYkRBEqXs%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video" alt="感知器算法总结" title="感知器算法总结"></p>
+<h3 id="3-">3. 实现感知器对象</h3>
+<pre><code class="language-python"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Perceptron</span><span class="hljs-params">(object)</span>:</span>
+    <span class="hljs-string">"""
+    eta: 学习率
+    n_iter: 权重向量的训练次数
+    w_: 神经分叉权重向量
+    errors_: 用于记录神经元判断出错的次数
+    """</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, eta=<span class="hljs-number">0.01</span>, n_iter=<span class="hljs-number">10</span>)</span>:</span>
+        self.eta = eat
+        self.n_iter = n_iter
+        <span class="hljs-keyword">pass</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">fit</span><span class="hljs-params">(self, x, y)</span>:</span>
+        <span class="hljs-string">"""
+        输入训练数据,培训神经元
+        x输入训练向量
+        y对应样本正确分类
+
+        x:shape[n_samples, n_features]
+        x:[[1, 2, 3], [4, 5, 6]]
+        n_samples: 2
+        n_features: 3
+
+        y:[1, -1]
+        """</span>
+
+        <span class="hljs-string">"""
+        初始化权重向量为0
+        """</span>
+        self.w_ = np.zero(<span class="hljs-number">1</span> + x.shape[<span class="hljs-number">1</span>])
+        self.errors_ = []
+
+        <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> range(self.n_iter):
+            errors = <span class="hljs-number">0</span>
+
+            <span class="hljs-string">"""
+            x = [[1, 2, 3], [4, 5, 6]]
+            y = [1, -1]
+            zip(x, y) = [([1, 2, 3], 1), ([4, 5, 6], -1)]
+            """</span>
+            <span class="hljs-keyword">for</span> xi, target <span class="hljs-keyword">in</span> zip(x, y):
+                update = self.eta * (target - self.predict(xi))
+                self.w_[<span class="hljs-number">1</span>:] += update * xi
+
+                self.w_[<span class="hljs-number">0</span>] += update
+
+                errors += int(update != <span class="hljs-number">0.0</span>)
+                <span class="hljs-keyword">pass</span>
+
+            self.errors_.append(errors)
+            <span class="hljs-keyword">pass</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">net_input</span><span class="hljs-params">(self, x)</span>:</span>
+        <span class="hljs-keyword">return</span> np.dot(x, self.w_[<span class="hljs-number">1</span>:]) + self.w_[<span class="hljs-number">0</span>]
+        <span class="hljs-keyword">pass</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">predict</span><span class="hljs-params">(self, x)</span>:</span>
+        <span class="hljs-keyword">return</span> np.where(self.net_input(x) &gt;= <span class="hljs-number">0.0</span> , <span class="hljs-number">1</span>, <span class="hljs-number">-1</span>)
+    <span class="hljs-keyword">pass</span></code></pre>
+<h3 id="4-">4. 数据解析和可视化</h3>
+<pre><code class="language-python"><span class="hljs-attr">file</span> = <span class="hljs-string">"训练数据路径.csv"</span>
+<span class="hljs-built_in">import</span> pandas as pd <span class="hljs-comment">#csv文件读取</span>
+<span class="hljs-attr">df</span> = pd.read_csv(file, <span class="hljs-attr">header=None)</span>
+df.head(<span class="hljs-number">10</span>)
+
+
+<span class="hljs-built_in">import</span> matplotlib.pyplot as plt <span class="hljs-comment">#数据可视化工具</span>
+<span class="hljs-built_in">import</span> numpy as np <span class="hljs-comment">#对数据进行加工运算</span>
+
+<span class="hljs-attr">y</span> = df.loc[<span class="hljs-number">0</span>:<span class="hljs-number">100</span>, <span class="hljs-number">4</span>].values <span class="hljs-comment">#输出0到100行的第四列的数据</span>
+
+<span class="hljs-attr">y</span> = np.where(<span class="hljs-attr">y</span> == 'Iris-setosa', -<span class="hljs-number">1</span>, <span class="hljs-number">1</span>)
+
+<span class="hljs-attr">x</span> = df.iloc[<span class="hljs-number">0</span>:<span class="hljs-number">100</span>, [<span class="hljs-number">0</span>, <span class="hljs-number">2</span>]].values
+
+plt.scatter(x[:<span class="hljs-number">50</span>,<span class="hljs-number">0</span>], x[:<span class="hljs-number">50</span>, <span class="hljs-number">1</span>], <span class="hljs-attr">color='red',</span> <span class="hljs-attr">marker='o',</span> <span class="hljs-attr">label='setosa')</span> 
+
+plt.scatter(x[<span class="hljs-number">50</span>:<span class="hljs-number">100</span>,<span class="hljs-number">0</span>], x[<span class="hljs-number">50</span>:<span class="hljs-number">100</span>, <span class="hljs-number">1</span>], <span class="hljs-attr">color='blue,</span> <span class="hljs-attr">marker='x',</span> <span class="hljs-attr">label='versicolor)</span> 
+plt.xlabel('花瓣长度')
+plt.ylabel('花径长度')
+plt.legend(<span class="hljs-attr">loc=‘upper</span> left’)
+plt.show()</code></pre>
+<h3 id="5-">5. 神经网络对数据实现分类</h3>
+<p>下面通过代码, 看看通过模型是如何将数据进行分类的. 并把数据分类后的结果进行可视化的方式呈现出来. 我们将通过python编写一个函数, 它的功能是把预测的数据输入到神经网络模型中, 得到模型的分类结果后, 把结果通过图像的方式绘制出来.</p>
+<pre><code class="language-python">from matplotlib.colors import ListedColormap
+def plot_decision_region(<span class="hljs-keyword">x</span>, y, classifier, resolution = <span class="hljs-number">0.02</span>):
+    marker = ('s', '<span class="hljs-keyword">x</span>', 'o', 'v')
+    colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
+    cmap = ListedColormap(colors[:len(np.unique(y))])
+
+    <span class="hljs-keyword">x</span><span class="hljs-number">1</span>_min, <span class="hljs-keyword">x</span><span class="hljs-number">1</span>_max = <span class="hljs-keyword">x</span>[:, <span class="hljs-number">0</span>].<span class="hljs-keyword">min</span>() - <span class="hljs-number">1</span>, <span class="hljs-keyword">x</span>[:, <span class="hljs-number">0</span>].<span class="hljs-keyword">max</span>()
+       <span class="hljs-keyword">x</span><span class="hljs-number">2</span>_min, <span class="hljs-keyword">x</span><span class="hljs-number">2</span>_max = <span class="hljs-keyword">x</span>[:, <span class="hljs-number">1</span>].<span class="hljs-keyword">min</span>() - <span class="hljs-number">1</span>, <span class="hljs-keyword">x</span>[:, <span class="hljs-number">1</span>].<span class="hljs-keyword">max</span>()
+
+    xx<span class="hljs-number">1</span>, xx<span class="hljs-number">2</span> = np.meshgrid(np.arange(<span class="hljs-keyword">x</span><span class="hljs-number">1</span>_min, <span class="hljs-keyword">x</span><span class="hljs-number">1</span>_max, resolution),np.arange(<span class="hljs-keyword">x</span><span class="hljs-number">2</span>_min, <span class="hljs-keyword">x</span><span class="hljs-number">2</span>_max, resolution))
+
+    z = classifier.predict(np.array([xx<span class="hljs-number">1</span>.ravel(), xx<span class="hljs-number">2</span>.ravel()]).T)
+
+    z = z.reshape[xx<span class="hljs-number">1</span>.shape]
+    plt.contourf(xx<span class="hljs-number">1</span>, xx<span class="hljs-number">2</span>, alpha=<span class="hljs-number">0.4</span>, cmap=cmap)
+    plt.xlim(xx<span class="hljs-number">1</span>.<span class="hljs-keyword">min</span>(), xx<span class="hljs-number">1</span>.<span class="hljs-keyword">max</span>())
+    plt.ylim(xx<span class="hljs-number">2</span>.<span class="hljs-keyword">min</span>(), xx<span class="hljs-number">2</span>.<span class="hljs-keyword">max</span>())
+
+    for idx, cl in enumerate(np.unique(y)):
+        plt.scatter(<span class="hljs-keyword">x</span>=<span class="hljs-keyword">x</span>[y==<span class="hljs-keyword">c</span><span class="hljs-number">1</span>, <span class="hljs-number">0</span>], y=<span class="hljs-keyword">x</span>[y==<span class="hljs-keyword">c</span>,<span class="hljs-number">1</span>], alpha=<span class="hljs-number">0.8</span>, <span class="hljs-keyword">c</span>=cmap(idx), marker=markers[idx], label=cl)
+
+
+plot_desision_regions(<span class="hljs-keyword">x</span>, y, ppn, resolution=<span class="hljs-number">0.02</span>)
+plt.xlabel('花径长度')
+plt.ylabel('花瓣长度')
+plt.legend(loc='upper left')
+plt.show()</code></pre>
+<h3 id="6-">6. 适应性线性神经元基本原理</h3>
+<p>适应性线性神经元与前面的感知器的差别在于, 感知器在得到点积结果以后, 是通过一个一个步调函数来返回1或-1, 以此来修改权重向量.而适应性神经元是直接用得到结果与正确结果的距离来更新权重. </p>
+<p>距离的定义使用<code>和方差公式</code>, 如下所示<br><img src="https://thumbnail10.baidupcs.com/thumbnail/0e80310424f9afe16936b84161db7546?fid=657587317-250528-517662457592757&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-MD6TccVbjNl1hIcAkMMxNq9t9cg%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video" alt="和方差公式" title="和方差公式">  </p>
+<p>这里更新权重的方式叫做<code>渐进下降法</code>, 总结的说就是获取当前的距离(差值)获取在和方差公式中当前位置的导数, 根据导数的正负判断是应该增加还是减少权重.  </p>
+<p>增加以及减少的公式可以参考下图<br><img src="https://thumbnail10.baidupcs.com/thumbnail/6c400438d3d36cf79f174be5745c5356?fid=657587317-250528-554763398198249&time=1518616800&rt=sh&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-231rtUuuq8bCyi54RNCEViwMis4%3D&expires=8h&chkv=0&chkbd=0&chkpc=&dp-logid=1042268480091194460&dp-callid=0&size=c1280_u800&quality=90&vuk=-&ft=video" alt="自适应权重更新" title="自适应权重更新"></p>
+<h3 id="7-">7. 适应性神经元代码实现</h3>
+<pre><code class="language-python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AdalineGD</span>(<span class="hljs-title">object</span>):</span>
+    <span class="hljs-string">""</span><span class="hljs-string">"
+    eta: float
+    学习效率, 处于0和1
+
+    n_iter: int
+    对训练数据进行学习改进次数
+
+    w_: 一维向量
+    存储权重数值
+
+    error_:int
+    存储每次迭代改进时, 网络对数据进行错误判断d额次数
+    "</span><span class="hljs-string">""</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(<span class="hljs-keyword">self</span>, eta=<span class="hljs-number">0</span>.<span class="hljs-number">01</span>, n_iter=<span class="hljs-number">50</span>)</span></span>:
+        <span class="hljs-keyword">self</span>.eta = eta
+        <span class="hljs-keyword">self</span>.n_iter = n_iter
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">fit</span><span class="hljs-params">(<span class="hljs-keyword">self</span>, x, y)</span></span>:
+        <span class="hljs-string">""</span><span class="hljs-string">"
+        x:二维数组[n_samples, n_features]
+        n_samples 表示x中含有训练数据条目数
+        n_features 含有4个数据的一维向量, 用于表示一条训练条目
+
+        y: 一维向量
+        用于存储每一训练条目对应的正确分类
+        "</span><span class="hljs-string">""</span>
+
+        <span class="hljs-keyword">self</span>.w<span class="hljs-number">_</span> = np.zeros(<span class="hljs-number">1</span> + x.shape[<span class="hljs-number">1</span>])
+        <span class="hljs-keyword">self</span>.const<span class="hljs-number">_</span> = []
+
+        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(<span class="hljs-keyword">self</span>.n_iter):
+            output = <span class="hljs-keyword">self</span>.net_input(x)
+            <span class="hljs-comment">#out = 点积结果</span>
+
+            errors = (y - output)
+
+            <span class="hljs-keyword">self</span>.w<span class="hljs-number">_</span>[<span class="hljs-number">1</span><span class="hljs-symbol">:</span>] += <span class="hljs-keyword">self</span>.eta * x.T.dot(errors)
+            <span class="hljs-keyword">self</span>.w<span class="hljs-number">_</span>[<span class="hljs-number">0</span>] += <span class="hljs-keyword">self</span>.eta * errors.sum()
+
+            cost = (errors ** <span class="hljs-number">2</span>).sum() / <span class="hljs-number">2.0</span>
+            <span class="hljs-keyword">self</span>.cost<span class="hljs-number">_</span>.append(cost)
+
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">self</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">net_input</span><span class="hljs-params">(<span class="hljs-keyword">self</span>, x)</span></span>:
+        <span class="hljs-keyword">return</span> np.dot(x, <span class="hljs-keyword">self</span>.w<span class="hljs-number">_</span>[<span class="hljs-number">1</span><span class="hljs-symbol">:</span>]) + <span class="hljs-keyword">self</span>.w<span class="hljs-number">_</span>[<span class="hljs-number">0</span>]
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">activation</span><span class="hljs-params">(<span class="hljs-keyword">self</span>, x)</span></span>:
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">self</span>.net_input(x)
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">predict</span><span class="hljs-params">(<span class="hljs-keyword">self</span>, x)</span></span>:
+        <span class="hljs-keyword">return</span> np.where(<span class="hljs-keyword">self</span>.activation(x) &gt;= <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, -<span class="hljs-number">1</span>)
+</code></pre>
+<h3 id="8-">8. 运行适应性神经网络</h3>
+<pre><code class="language-python">ada = AdalineGD(eta=<span class="hljs-number">0.0001</span>, n_iter=<span class="hljs-number">50</span>)
+ada.fit(x, y)
+<span class="hljs-function"><span class="hljs-title">plot_decision_regions</span><span class="hljs-params">(x, y, classifier=ada)</span></span>
+plt.title(<span class="hljs-string">'Adaline-Gradient descent'</span>)
+plt.xlabel(<span class="hljs-string">'花径长度'</span>)
+plt.ylabel(<span class="hljs-string">'花瓣长度'</span>)
+plt.legend(loc=<span class="hljs-string">'upper left'</span>)
+plt.show()
+
+plt.plot(range(<span class="hljs-number">1</span>, len(ada.cost_) + <span class="hljs-number">1</span>), ada<span class="hljs-selector-class">.cost_</span>, marker=<span class="hljs-string">'o'</span>)
+plt.xlabel(<span class="hljs-string">'Epochs'</span>)
+plt.ylabel(<span class="hljs-string">'sum-squard-error'</span>)
+plt.show()</code></pre>
+<h3 id="9-">9. 外链接</h3>
+
+    </div>
+</body>
+</html>

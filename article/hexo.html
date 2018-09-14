@@ -1,0 +1,173 @@
+<html>
+<meta charset="utf-8" />
+<title>Github + Hexo 搭建博客</title>
+<link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github-gist.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../resource/common.css" type="text/css" />
+<link rel="stylesheet" href="../resource/article.css" type="text/css" />
+
+<body>
+    <div class="main-container">
+        <h1 id="github-hexo-">Github + Hexo 搭建博客</h1>
+<blockquote>
+<p>今天尝试着用在github上搭建个人博客, 折腾了挺久, 最后弄完效果感觉还不错, 正好把建站过程写下作为这个博客的第一篇文章. 这篇文章主要教你如何使用Hexo与NexT主题创建基础的博客网站静态文件, 并利用GitHub Pages将他们发布.  </p>
+</blockquote>
+<!-- more -->
+
+<h2 id="-">环境准备</h2>
+<ul>
+<li>安装Git</li>
+<li>安装Nodejs</li>
+<li>一个Github账号</li>
+</ul>
+<p>具体的安装细节就不多说了, 很容易搜索到..</p>
+<h2 id="github-pages">GitHub Pages</h2>
+<p>Github Pages就是将我们仓库中的静态页作为一个可以直接访问的站点. 创建的过程还是比较简单的, 这里简单描述一下:  </p>
+<ol>
+<li>创建一个新的仓库, 名称为<strong>username.github.io</strong>, username就是你的账户名.  </li>
+<li>将这个仓库克隆到本地  </li>
+</ol>
+<pre><code>$ git clone git@github<span class="hljs-selector-class">.com</span>:fiyc/fiyc<span class="hljs-selector-class">.github</span><span class="hljs-selector-class">.io</span><span class="hljs-selector-class">.git</span> blog</code></pre><ol start="3">
+<li>试着在blog文件中添加一个index.html并推送到远程库  </li>
+</ol>
+<pre><code><span class="hljs-meta">$</span><span class="bash"> <span class="hljs-built_in">cd</span> blog</span>
+<span class="hljs-meta">$</span><span class="bash"> vim index.html</span>
+<span class="hljs-meta">
+
+$</span><span class="bash"> git add index.html</span>
+<span class="hljs-meta">$</span><span class="bash"> git commit -m <span class="hljs-string">"init"</span></span>
+<span class="hljs-meta">$</span><span class="bash"> git push origin master</span></code></pre><ol start="4">
+<li>进入刚刚创建的repository, 选择<strong>Settings</strong>标签, 然后设置下方的<strong>GitHub Pages</strong>  </li>
+</ol>
+<p>现在通过地址username.github.io 应该就可以访问到我们刚刚创建的页面了</p>
+<h2 id="-">绑定自己的域名</h2>
+<p>如果你想要将通过自己的域名来访问GitHub Pages, 那么就需要按照下面步骤操作:  </p>
+<ol>
+<li><p>进入万网域名解析页面, 选择添加解析.
+记录类型选择<strong>CNAME</strong><br>主机记录<strong>www</strong><br>解析线路<strong>默认</strong>   </p>
+</li>
+<li><p>在blog根目录下添加CNAME文件, 并在其中写入你的域名, 最后推送至远程库  </p>
+</li>
+</ol>
+<pre><code><span class="hljs-meta">$</span><span class="bash"> <span class="hljs-built_in">cd</span> blog</span>
+<span class="hljs-meta">$</span><span class="bash"> vim CNAME</span>
+www.fiyc.space
+<span class="hljs-meta">
+$</span><span class="bash"> git add CNAME</span>
+<span class="hljs-meta">$</span><span class="bash"> git commit -m <span class="hljs-string">"add cname"</span></span>
+<span class="hljs-meta">$</span><span class="bash"> git push origin master</span></code></pre><p>现在通过配置的域名就可以访问我们的站点了</p>
+<h2 id="-hexo">安装并配置Hexo</h2>
+<p>其实完成上述的工作, 我们的站点就以及部署完毕了, 剩下的就是完善页面工作了. 但是为了专注于文章本身, 所以这里选择Hexo来帮助我们生成网站的静态页面.  </p>
+<p>Hexo的<a href="https://hexo.io/zh-cn/docs/">文档</a>里有很详细的使用说明, 如果有耐心的话可以去看一看, 大概10分钟左右就能看完了.  </p>
+<h3 id="-">安装</h3>
+<p><strong>安装Hexo</strong>  </p>
+<pre><code><span class="hljs-meta">$</span><span class="bash"> npm install -g hexo-cli</span></code></pre><p><strong>安装hexo-deployer-git</strong>  </p>
+<pre><code><span class="hljs-meta">$</span><span class="bash"> npm install hexo-deployer-git --save</span></code></pre><h3 id="-blog">初始化Blog</h3>
+<p>因为我希望将Hexo的配置也存放在Github上面, 但是Hexo在初始化的时候要求目录下为空, 所以我没有在git仓库的根目录下初始化  </p>
+<pre><code><span class="hljs-meta">$</span><span class="bash"> <span class="hljs-built_in">cd</span> blog</span>
+<span class="hljs-meta">$</span><span class="bash"> git branch hexo</span>
+<span class="hljs-meta">$</span><span class="bash"> git checkout hexo</span>
+<span class="hljs-meta">$</span><span class="bash"> hexo init hexoConfig</span>
+<span class="hljs-meta">$</span><span class="bash"> git add *</span>
+<span class="hljs-meta">$</span><span class="bash"> git commit -m <span class="hljs-string">"init hexo"</span></span>
+<span class="hljs-meta">$</span><span class="bash"> git push origin hexo</span></code></pre><p>初始化过后的hexoConfig目录大概就是下面这样  </p>
+<pre><code>
+├── <span class="hljs-variable">_config</span>.yml
+├── package.json
+├── scaffolds
+├── source
+|   ├── <span class="hljs-variable">_drafts</span>
+|   └── <span class="hljs-variable">_posts</span>
+└── themes</code></pre><h3 id="-">配置站点配置文件</h3>
+<p>接下来我们进行一些最基本的配合, 如果想了解更多的话还是建议仔细阅读官方文档.  </p>
+<p>打开<strong>blog/hexoConfig/_config.yml</strong>文件, 修改下面几项:   </p>
+<pre><code><span class="hljs-symbol">title:</span> 你的站点名
+<span class="hljs-symbol">author:</span> 你的名字
+<span class="hljs-symbol">language:</span> zh-Hans <span class="hljs-meta">#中文</span>
+<span class="hljs-symbol">url:</span> http:<span class="hljs-comment">//www.fiyc.space</span>
+<span class="hljs-symbol">
+deploy:</span>
+<span class="hljs-symbol">    type:</span> git
+<span class="hljs-symbol">    repo:</span> 之前申请的仓库地址
+<span class="hljs-symbol">    branch:</span> master</code></pre><p>在blog/hexoConfig/source目录下新建一个CNAME文件, 没错, 就是和前面说到的CNAME文件一模一样。</p>
+<h2 id="-">几个基本指令</h2>
+<p>做到这里, 我们已经对Hexo进行了安装并且进行了最基础的配置, 现在我们可以使用Hexo生成静态页面并且部署至GitHub, 下面是一些常用的指令</p>
+<h3 id="generate">generate</h3>
+<pre><code><span class="hljs-meta">$</span><span class="bash"> hexo generate </span>
+<span class="hljs-meta">$</span><span class="bash"> hexo g <span class="hljs-comment"># 简写</span></span></code></pre><p>生成静态文件  </p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-d</td>
+<td>生成文件后立刻部署</td>
+</tr>
+<tr>
+<td>-w</td>
+<td>监视文件改动</td>
+</tr>
+</tbody></table>
+<h3 id="server">server</h3>
+<pre><code>$ hexo<span class="hljs-built_in"> server </span>
+$ hexo s #简写 </code></pre><p>启动服务器, 默认端口为4000</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-p</td>
+<td>重设端口</td>
+</tr>
+<tr>
+<td>-s</td>
+<td>只使用静态文件</td>
+</tr>
+<tr>
+<td>-l</td>
+<td>记录日志</td>
+</tr>
+</tbody></table>
+<h3 id="deploy">deploy</h3>
+<pre><code><span class="hljs-meta">$</span><span class="bash"> hexo deploy </span></code></pre><p>部署生成的静态文件, 在我们现在的配置下就是讲静态文件推送到Github</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-g</td>
+<td>部署之前预先生成静态文件</td>
+</tr>
+</tbody></table>
+<h3 id="new">new</h3>
+<pre><code>$ hexo <span class="hljs-keyword">new</span> [layout] &lt;<span class="hljs-built_in">title</span>&gt;</code></pre><p>新建一篇文章。如果没有设置 layout 的话，默认使用 <em>config.yml 中的 default</em>layout 参数代替。如果标题包含空格的话，请使用引号括起来. </p>
+<h2 id="-next-">使用NexT主题</h2>
+<p>Next的<a href="http://theme-next.iissnan.com/getting-started.html">文档</a>说的也很详细, 可以直接查阅  </p>
+<h3 id="-">安装</h3>
+<ol>
+<li>直接将主题项目克隆到themes目录下  </li>
+</ol>
+<pre><code><span class="hljs-meta">$</span><span class="bash"> <span class="hljs-built_in">cd</span> blog/hexoConfig</span>
+<span class="hljs-meta">$</span><span class="bash"> git <span class="hljs-built_in">clone</span> https://github.com/iissnan/hexo-theme-next themes/next</span></code></pre><ol start="2">
+<li>修改项目配置文件blog/hexoConfig/_config.yml 下的theme, 将值改为next</li>
+</ol>
+<h3 id="-_config-yml-">主题配置文件_config.yml的一些配置关键字</h3>
+<p>主题的配置文件为 <strong>blog/hexoConfig/themes/next/_config.yml</strong>
+<strong>设置菜单:</strong>  menu 
+<strong>设置风格:</strong>  scheme 
+<strong>设置侧边栏社交信息:</strong>  social 
+<strong>设置头像:</strong>  avatar </p>
+<h3 id="-">其他的一些个性化配置</h3>
+<p>这个主要是在<a href="http://www.jianshu.com/p/f054333ac9e6">简书</a>上看到的, 写了很多有用的配置, 有兴趣的可以自己试一试, 这里就不一一描述了.</p>
+
+    </div>
+</body>
+</html>

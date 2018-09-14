@@ -1,0 +1,107 @@
+<html>
+<meta charset="utf-8" />
+<title>拖拽上传文件实现过程记录</title>
+<link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github-gist.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../resource/common.css" type="text/css" />
+<link rel="stylesheet" href="../resource/article.css" type="text/css" />
+
+<body>
+    <div class="main-container">
+        <h1 id="-">拖拽上传文件实现过程记录</h1>
+<p>最近写了一个文件拖拽上传的页面, 因为之前从来没有实现过文件拖拽的功能, 感觉还是蛮好玩的. 同时, 在整个过程中也遇到了一些问题, 在这里专门做一个完整的记录.  </p>
+<!-- more -->
+
+<h2 id="-">遇到的问题</h2>
+<ul>
+<li>express 实现文件上传</li>
+<li>文件拖拽页面实现</li>
+<li>ajax异步上传文件</li>
+</ul>
+<h2 id="express-">express 实现文件上传</h2>
+<p>说来着还是第一次尝试使用<code>node</code> + <code>express</code>作为后台, 关于文件上传的功能, 网上直接找了下实现方案, 最后确定使用<code>multer</code>中间件来实现上传文件功能. 这个过程其实还是蛮顺利的, 唯一需要注意的是<code>multer</code>要求请求的<code>Content-Type</code>必须是<code>multipart/form-data</code>, 这在<a href="https://www.npmjs.com/package/multer">npm</a>上有这说明:</p>
+<blockquote>
+<p>NOTE: Multer will not process any form which is not multipart (multipart/form-data).</p>
+</blockquote>
+<p>当然这一点也导致我后面遇到了问题, 这个在后面说到<code>ajax异步上传文件</code>时再说.  </p>
+<p>使用<code>multer</code>的代码很少, 大致过程如下:  </p>
+<p><strong>安装multer包</strong></p>
+<pre><code>$ npm <span class="hljs-keyword">install </span><span class="hljs-keyword">multer </span>--save</code></pre><p><strong>在route中指定请求接受的文件</strong></p>
+<pre><code><span class="hljs-keyword">const</span> multer = <span class="hljs-built_in">require</span>(<span class="hljs-string">'multer'</span>);
+<span class="hljs-keyword">const</span> upload = multer({<span class="hljs-attr">storage</span>: storage});
+
+<span class="hljs-keyword">const</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">'express'</span>);
+<span class="hljs-keyword">const</span> router = express.Router();
+router.post(<span class="hljs-string">'/upload'</span>, upload.single(<span class="hljs-string">'filename'</span>), controller.upload);
+
+<span class="hljs-built_in">module</span>.exports = router;</code></pre><p><strong>在对应的回调函数中获取到文件信息</strong></p>
+<pre><code><span class="hljs-function"><span class="hljs-keyword">module</span>.<span class="hljs-title">exports</span> =</span> {
+    upload: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res, next)</span>{</span>
+        <span class="hljs-comment">//req.file 即上传的文件</span>
+    }
+}</code></pre><p>至此, <code>http://localhost:3000/uplaod</code>就可以接受文件上传了.</p>
+<h2 id="-">文件拖拽页面实现</h2>
+<p>拖拽的实现其实主要就是对于几个拖拽事件的使用, 这里我用到了</p>
+<ul>
+<li>drop</li>
+<li>dragenter</li>
+<li>dragleave</li>
+</ul>
+<p>这三个事件.  </p>
+<p>不过在写的时候发现别人一种比较有趣的绑定事件方法, 之前从来不知道还可以这样用. 如下: </p>
+<pre><code><span class="hljs-keyword">var</span> preventDefaultOperation = <span class="hljs-comment">{
+    dragleave: functioni(e){
+        e.preventDefault();
+    }</span>,
+    drop: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e)</span><span class="hljs-comment">{
+        e.preventDefault();        
+    }</span>,
+    <span class="hljs-title">dragenter</span>:</span> <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e)</span><span class="hljs-comment">{
+        e.preventDefault();
+    }</span>,
+    <span class="hljs-title">dragover</span>:</span> <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e)</span><span class="hljs-comment">{
+        e.preventDefault();
+    }</span>
+}
+
+$<span class="hljs-params">(document)</span>.<span class="hljs-title">on</span><span class="hljs-params">(preventdefaultoperation)</span>;</span></code></pre><p>上面的代码取消了事件的默认动作, 我认为比较有趣的是直接在<code>on</code>函数中传递了一个对象, 又学到了一点.  </p>
+<p>之后就是自己实现具体事件触发时的逻辑:</p>
+<pre><code><span class="hljs-keyword">var</span> dragContent = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'dragContent'</span>);
+dragContent.addEventListener(<span class="hljs-string">'drop'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">e</span>) </span>{
+    drapHander.dragLeave(dragContent);
+        <span class="hljs-keyword">if</span> (e.dataTransfer.files.length &gt; <span class="hljs-number">0</span>) {
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; e.dataTransfer.files.length; i++){
+                <span class="hljs-comment">// files.push(e.dataTransfer.files[i]);</span>
+                fileHander.push(e.dataTransfer.files[i]);
+            }
+        }
+    });
+
+dragContent.addEventListener(<span class="hljs-string">'dragenter'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">e</span>) </span>{
+    drapHander.dragEnter(dragContent);
+});
+
+dragContent.addEventListener(<span class="hljs-string">'dragleave'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">e</span>) </span>{
+    drapHander.dragLeave(dragContent);
+});</code></pre><p>上面的三个事件中, <code>drop</code>在拖动文件进入对象中并释放鼠标时触发, 因此在这个事件中我通过<code>e.dataTransfer.files</code>来获取拖动的文件. <code>dragenter</code>与<code>dragleave</code>分别在拖动进入到对象以及离开对象时触发, 这里就只是做了样式上的改变.</p>
+<h2 id="ajax-">ajax异步上传文件</h2>
+<p>在最开始我是使用<code>form</code>通过<code>ajaxForm</code>来实现异步上传的. 这种方式的话要记得要把<code>form</code>的<code>enctype</code>属性设置成<code>multipart/form-data</code>, 也就是<code>multer</code>文档中说的那样, 否则文件无法被中间件处理.  </p>
+<p>当我准备完成多个文件上传的时候, 我发现直接使用<code>form</code>有点困难. 原因是我不知道该如何动态的向<code>form</code>中添加文件. 在网上搜了很多, 貌似<code>&lt;input type=&quot;file&quot;&gt;</code>也不允许通过js去修改它的值. 于是这里我准备换一种方式, 通过<code>formData</code>对象来构造我的请求数据, 然后通过<code>ajax</code>来发送请求. 实现的代码如下:</p>
+<pre><code><span class="hljs-keyword">var</span> submitFile = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">file</span>)</span>{
+    <span class="hljs-keyword">var</span> formData = <span class="hljs-keyword">new</span> FormData();
+    formData.append(<span class="hljs-string">'filename'</span>, file, file.name);
+
+    <span class="hljs-keyword">var</span> xhr = <span class="hljs-keyword">new</span> XMLHttpRequest();
+    xhr.open(<span class="hljs-string">'POST'</span>, <span class="hljs-string">'/upload'</span>, <span class="hljs-literal">true</span>);
+
+    xhr.onreadystatechange = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+        <span class="hljs-keyword">if</span>(xhr.readyState === <span class="hljs-number">4</span>){
+            <span class="hljs-keyword">var</span> res = <span class="hljs-built_in">JSON</span>.parse(xhr.resposeText);
+        }
+    }
+}</code></pre><p>这里需要重点说的是, 由于我始终记得需要设置<code>Content-Type</code>, 所以上面的代码中我原本加了设置header的代码, 但是最后发现在后台无法获取到文件. 最后发现是我自己设置的<code>xhr.setRequestHeader(&#39;Content-type&#39;, &#39;multipart/form-data&#39;)</code>引起的, 直接让xhr来处理我的请求格式就可以了.</p>
+<h2 id="-">尾</h2>
+<p>虽然总的来说, 这次实现的功能很简单, 但是还是从中了解了一些以前所不熟悉的东西. 除了上面提到的一些, 我还添加了一些上传文件的展示以及针对excel文件转换成sql的功能, 代码可以在<a href="https://github.com/fiyc/front-end/tree/master/DragUpoadFile">这里</a>看到.</p>
+
+    </div>
+</body>
+</html>

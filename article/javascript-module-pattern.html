@@ -1,0 +1,119 @@
+<html>
+<meta charset="utf-8" />
+<title>JavaScript设计模式 - 模块化模式</title>
+<link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github-gist.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../resource/common.css" type="text/css" />
+<link rel="stylesheet" href="../resource/article.css" type="text/css" />
+
+<body>
+    <div class="main-container">
+        <blockquote>
+<p>模块是任何健壮的应用程序体系结构不可或缺的一部分, 特点是有助于保持应用项目的代码单元既能清晰地分离又有组织.</p>
+</blockquote>
+<!-- more -->
+<p>模块化这一节并没有让我学到什么新东西, 可能是原本就经常使用的缘故. 这里只是针对书中内容做一下简单的笔记.  </p>
+<p>要理解模块化, 在这里需要对<code>对象</code>, <code>闭包</code>有一些了解.</p>
+<h2 id="-">对象</h2>
+<p>在<code>JavaScript</code>中, 对象被描述为一组包含在<code>{}</code>中的, 由<code>,</code>分隔的<code>键/值</code>对. 键与值之间使用<code>:</code>分隔. 下面的代码是一个对象的例子</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">var</span> myObjectLiteral = {
+    variableKey: variableValue,
+    functionKey: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+        <span class="hljs-comment">// ...</span>
+    }
+};</code></pre>
+<p>当我们要调用对象的函数或是为对象添加属性时</p>
+<pre><code class="language-javascript">myObjectLiteral.functionkey();
+
+myObjectLiteral.<span class="hljs-keyword">new</span><span class="hljs-type">VariableKey</span> = <span class="hljs-keyword">new</span><span class="hljs-type">Value</span>;</code></pre>
+<h2 id="-">模块实现私有公有成员</h2>
+<p>由于<code>JavaScript</code>本身并不支持私有公有成员的定义, 因此这里我们通过一个<code>IIFE(立即执行函数表达式)</code>来返回一个对象. 在返回的对象中只包含了我们希望模块外部可访问的公有属性. 而私有属性则存在于这个立即执行函数所在的域内, 不可访问或只能通过暴露出的公有方法可访问.  </p>
+<p>下面是一个简单的例子</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">var</span> testModule = (<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+
+    <span class="hljs-keyword">var</span> counter = <span class="hljs-number">0</span>;
+
+    <span class="hljs-keyword">return</span> {
+        <span class="hljs-attr">incrementCounter</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+            <span class="hljs-keyword">return</span> counter++;
+        },
+
+        <span class="hljs-attr">resetCounter</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"counter value prior to reset: "</span> + counter);
+            counter = <span class="hljs-number">0</span>;
+        }
+    }
+})();</code></pre>
+<p>在上面的例子中, 我们拿到的<code>testModule</code>实际是后面这个立即执行函数的返回值, 也就是函数中<code>return</code>的那个对象.  </p>
+<p>因此, 我们不可以直接获取<code>counater</code>这个属性, 我们只能通过<code>incrementCounter</code>以及<code>resetCounter</code>来操作这个私有属性.</p>
+<h2 id="-">一些模块化使用的变体</h2>
+<p>虽然书中在介绍这里的时候说是<code>Module Pattern Variations</code>, 但是我看过之后认为这只是前面提到内容的一种应用方式, 我觉得并不需要去死记硬背这些东西. 理解深入之后, 这些应用方式自然会在合适的时候被用到.  </p>
+<h3 id="-">导入混合</h3>
+<p>将全局对象引入模块, 并可以对它们自由命名</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">var</span> myModule = (<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"> JQ, _</span>)</span>{
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">privateMethod1</span>(<span class="hljs-params"></span>)</span>{
+        JQ(<span class="hljs-string">".container"</span>).html(<span class="hljs-string">"test"</span>);
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">privateMethod2</span>(<span class="hljs-params"></span>)</span>{
+        <span class="hljs-built_in">console</span>.log(_.min([<span class="hljs-number">10</span>, <span class="hljs-number">5</span>, <span class="hljs-number">100</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1000</span>]));
+    }
+
+    <span class="hljs-keyword">return</span> {
+        <span class="hljs-attr">publicMethod</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+            privateMethod1();
+        }
+    }
+})(JQuery, _);
+
+myModule.publicMethod();</code></pre>
+<h3 id="-">导出</h3>
+<p>这个例子坦白的说我没看出它有什么特殊的意义, 按照原书中的描述:  </p>
+<blockquote>
+<p>This next variation allows us to declare globals without consuming them.</p>
+</blockquote>
+<pre><code class="language-javascript">var myModule = (<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+
+    var <span class="hljs-function"><span class="hljs-keyword">module</span> =</span> {},
+    privateVariable = <span class="hljs-string">"Hello World!"</span>;
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">privateMethod</span><span class="hljs-params">()</span>{</span>
+        <span class="hljs-comment">// ...</span>
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">module</span>.<span class="hljs-title">publicProperty</span> =</span> <span class="hljs-string">"Foobar"</span>;
+
+    <span class="hljs-function"><span class="hljs-keyword">module</span>.<span class="hljs-title">publicMethod</span> =</span> <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+        console.<span class="hljs-built_in">log</span>( privateVariable );
+    };
+
+    return <span class="hljs-function"><span class="hljs-keyword">module</span>;
+})<span class="hljs-params">()</span>;</span></code></pre>
+<h3 id="-">暴露式模块化</h3>
+<p>这个在书中其实是单独作为一个设计模式来写的, 但是我觉得它与模块化模式差别并不是很大, 所以作为一个变体来描述.  </p>
+<p>暴露式模块化的不同点在于最后返回对象时, 返回的函数对象并非是一个匿名函数, 而是直接指向了函数体内定义的函数.可以看下面的例子:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">var</span> myRevealingModule = (<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+    <span class="hljs-keyword">var</span> privateVar = <span class="hljs-string">"Ben Cherry"</span>,
+        publicVar = <span class="hljs-string">"Hey there!"</span>;
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">privateFunction</span>(<span class="hljs-params"></span>)</span>{
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Name:"</span> + privateVar);
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">publicSetName</span>(<span class="hljs-params">strName</span>)</span>{
+        privateVar = strName;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">publicGetName</span>(<span class="hljs-params"></span>)</span>{
+        privateFunction();
+    }
+
+    <span class="hljs-keyword">return</span> {
+        <span class="hljs-attr">setName</span>: publicSetName,
+        <span class="hljs-attr">greeting</span>: publicVar,
+        <span class="hljs-attr">getName</span>: publicGetName
+    }
+})();</code></pre>
+
+    </div>
+</body>
+</html>

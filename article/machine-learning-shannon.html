@@ -1,0 +1,212 @@
+<html>
+<meta charset="utf-8" />
+<title>机器学习实战 使用香农熵划分数据集</title>
+<link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github-gist.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../resource/common.css" type="text/css" />
+<link rel="stylesheet" href="../resource/article.css" type="text/css" />
+
+<body>
+    <div class="main-container">
+        <h1 id="-">机器学习实战 使用香农熵划分数据集</h1>
+<p>香农熵(简称熵)是一种集合信息的度量方式. 本文作为《机器学习实战》这本书中香农熵部分的阅读笔记, 简单介绍一下如何使用香农熵来对数据进行划分.</p>
+<!-- more -->
+
+<blockquote>
+<p>划分数据集的大原则是: 将无序的数据变得更加有序. 在划分数据集前后信息发生的变化称为信息增益, 知道如何计算信息增益, 我们就可以计算每个特征值划分数据集后获得的信息增益, 获得信息增益最高的特征就是最好的选择.</p>
+</blockquote>
+<h2 id="-">信息增益与香农熵</h2>
+<p>前面我们说, 可以通过信息增益来度量每一次数据集划分. 那么具体是如何获得这个信息增益的呢?  </p>
+<p>这里我们就需要使用香农熵. 我自己的理解是, 香农熵描述了一组数据的混乱程度. 香农熵越高, 则说明这一组数据越混乱. 而我们划分数据的原则, 就是尽可能的减少划分后的数据的香农熵.  </p>
+<p>假设有这样一组数据 <code>[A, B, A, C, B, C, D]</code>, 通过计算我们得到它的香农熵为<code>x</code>.  </p>
+<p>之后我们将这一组数据分为两组<code>[A, A, D]</code>和<code>[B, B, C, C]</code>, 这两组数据计算得到的香农熵为<code>y</code>.  </p>
+<p>那么<code>x - y</code>得到的值我们就可以称为信息增益. 而我们在分割数据时要做的, 就是尝试按照不同的分割方法划分数据, 依次求出每次划分之后的信息增益, 最后选择一个信息增益最大的.</p>
+<h2 id="-">香农熵计算方式</h2>
+<p>香农熵的计算公式如下:<br><img src="/images/香农熵公式.png" alt="香农熵公式" title="香农熵公式">  </p>
+<p>直接看公式可能并不是非常的直观, 我们还是拿上面的例子来说</p>
+<pre><code>一组数据 [A, B, A, C, B, C, D]
+设 p 为每种标签出现的概率, 在上面的数据中一共有<span class="hljs-number">4</span>中标签, A, B, C, D
+所以
+P<span class="hljs-comment">(A)</span> = <span class="hljs-number">2</span>/<span class="hljs-number">7</span>
+P<span class="hljs-comment">(B)</span> = <span class="hljs-number">2</span>/<span class="hljs-number">7</span>
+P<span class="hljs-comment">(C)</span> = <span class="hljs-number">2</span>/<span class="hljs-number">7</span>
+P<span class="hljs-comment">(D)</span> = <span class="hljs-number">1</span>/<span class="hljs-number">7</span>
+
+那么这一组数据的香农熵为:
+H =- p<span class="hljs-comment">(A)</span> * lo<span class="hljs-name">g2</span>P<span class="hljs-comment">(A)</span> - p<span class="hljs-comment">(B)</span> * lo<span class="hljs-name">g2</span>P<span class="hljs-comment">(B)</span> - p<span class="hljs-comment">(B)</span> * lo<span class="hljs-name">g2</span>P<span class="hljs-comment">(B)</span> - p<span class="hljs-comment">(B)</span> * lo<span class="hljs-name">g2</span>P<span class="hljs-comment">(B)</span>
+
+
+而当我们将数据划分为两组[A, A, D] [B, B, C, C]时, 香农熵需要分三步计算
+首先计算[A, A, D]
+p<span class="hljs-comment">(A)</span> = <span class="hljs-number">2</span>/<span class="hljs-number">3</span>
+p<span class="hljs-comment">(D)</span> = <span class="hljs-number">1</span>/<span class="hljs-number">3</span>
+
+H<span class="hljs-number">1</span> = -p<span class="hljs-comment">(A)</span> * lo<span class="hljs-name">g2</span>p<span class="hljs-comment">(A)</span> - p<span class="hljs-comment">(D)</span> * lo<span class="hljs-name">g2</span>p<span class="hljs-comment">(D)</span>
+
+然后计算[B, B, C, C]
+p<span class="hljs-comment">(B)</span> = <span class="hljs-number">1</span>/<span class="hljs-number">2</span>
+p<span class="hljs-comment">(C)</span> = <span class="hljs-number">1</span>/<span class="hljs-number">2</span>
+H<span class="hljs-number">2</span> = -p<span class="hljs-comment">(B)</span> * lo<span class="hljs-name">g2</span>p<span class="hljs-comment">(B)</span> - p<span class="hljs-comment">(C)</span> * lo<span class="hljs-name">g2</span>p<span class="hljs-comment">(C)</span>
+
+最后
+H = H<span class="hljs-number">1</span> * <span class="hljs-number">3</span>/<span class="hljs-number">7</span> + H<span class="hljs-number">2</span> * <span class="hljs-number">4</span>/<span class="hljs-number">7</span>
+为什么上面H<span class="hljs-number">1</span>要乘以<span class="hljs-number">3</span>/<span class="hljs-number">7</span>呢, 因为H<span class="hljs-number">1</span>对于的数据集[A, A, D]是原有数据集的<span class="hljs-number">3</span>/<span class="hljs-number">7</span></code></pre><p>知道如何计算一组数据集的香农熵之后, 我们来看下面这一组数据(数据集A), 并且我们会用<code>python</code>来写一个计算香农熵的函数  </p>
+<table>
+<thead>
+<tr>
+<th>特征0</th>
+<th>特征1</th>
+<th>特征2</th>
+<th>标签</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>true</td>
+<td>false</td>
+<td>true</td>
+<td>labelA</td>
+</tr>
+<tr>
+<td>false</td>
+<td>false</td>
+<td>false</td>
+<td>labelB</td>
+</tr>
+<tr>
+<td>false</td>
+<td>true</td>
+<td>true</td>
+<td>labelC</td>
+</tr>
+<tr>
+<td>false</td>
+<td>false</td>
+<td>true</td>
+<td>labelA</td>
+</tr>
+</tbody></table>
+<p>在上面的数据中, 为了方便起见, 我们只有三个特征, 且每个特征只有<code>true</code>和<code>false</code>两种值. 最后每一组数据会有一个对应的标签, 而我们计算香农熵就是通过这个标签来计算的.  </p>
+<p>下面是我们计算香农熵的代码:</p>
+<pre><code class="language-python"><span class="hljs-keyword">from</span> math import <span class="hljs-keyword">log</span>
+def calcShannonEnt(dataSet):
+    numEntries = len(dataSet)
+    <span class="hljs-keyword">label</span>Counts = {}
+    <span class="hljs-keyword">for</span> featVec <span class="hljs-keyword">in</span> dataSet:
+        currentLabel = featVec[-<span class="hljs-number">1</span>]
+
+        if currentLabel not <span class="hljs-keyword">in</span> <span class="hljs-keyword">label</span>Counts.keys():
+            <span class="hljs-keyword">label</span>Counts[currentLabel] = <span class="hljs-number">0</span>
+
+        <span class="hljs-keyword">label</span>Counts[currentLabel] += <span class="hljs-number">1</span>
+
+    shannonEnt = <span class="hljs-number">0.0</span>
+    <span class="hljs-keyword">for</span> key <span class="hljs-keyword">in</span> <span class="hljs-keyword">label</span>Counts:
+        prob = float(<span class="hljs-keyword">label</span>Counts[key]) / numEntries
+        shannonEnt -= prob * <span class="hljs-keyword">log</span>(prob, <span class="hljs-number">2</span>)
+
+    return shannonEnt</code></pre>
+<h2 id="-">划分数据与计算信息增益</h2>
+<p>由于我们在构建决策树时, 是根据特征来划分的. 那么在这里我们划分数据集, 也将通过特征来划分. 我们还是来看上面的数据集A.  </p>
+<p>当我们想要划分这样一个数据集时, 假设我们希望按照<code>特征1</code>来划分. 由于这个特征一共有两种值. 于是我们在划分时就是这么一种情况: 数据集中只要<code>特征1</code>是<code>true</code>的分为一组, 其余的分为另一组. 于是我们得到了这样两组数据.  </p>
+<table>
+<thead>
+<tr>
+<th>特征0</th>
+<th>特征1</th>
+<th>特征2</th>
+<th>标签</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>true</td>
+<td>false</td>
+<td>true</td>
+<td>labelA</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>特征0</th>
+<th>特征1</th>
+<th>特征2</th>
+<th>标签</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>false</td>
+<td>false</td>
+<td>false</td>
+<td>labelB</td>
+</tr>
+<tr>
+<td>false</td>
+<td>true</td>
+<td>true</td>
+<td>labelC</td>
+</tr>
+<tr>
+<td>false</td>
+<td>false</td>
+<td>true</td>
+<td>labelA</td>
+</tr>
+</tbody></table>
+<p>现在我们要实现一个函数来完成上面的功能. 即这个函数入参为: 一个数据集<code>dataSet</code>, 一个指定的特征列<code>axis</code>以及一个指定的特征值<code>value</code>, 然后返回这个数据集中, 所有特征列<code>axis</code>值为<code>value</code>的行.</p>
+<pre><code class="language-python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">splitDataSet</span><span class="hljs-params">(dataSet, axis, value)</span></span>:
+    retDataSet = []
+    <span class="hljs-keyword">for</span> featVec <span class="hljs-keyword">in</span> <span class="hljs-symbol">dataSet:</span>
+        <span class="hljs-keyword">if</span> featVec[axis] == <span class="hljs-symbol">value:</span>
+            reduceFeatVec = featVec[<span class="hljs-symbol">:axis</span>]
+            reduceFeatVec.extend(featVec[axis+<span class="hljs-number">1</span><span class="hljs-symbol">:</span>])
+            retDataSet.append(reduceFeatVec)
+
+    <span class="hljs-keyword">return</span> retDataSet</code></pre>
+<p>现在我们一共完成了两个函数, 一个函数负责计算数据集的香农熵, 一个函数负责划分数据. 基于这两个函数, 我们就可以找出一组数据集中最合适的拆分特征. 我们简单的描述一下这个逻辑.</p>
+<pre><code>接收到一个数据集, 这个数据集有<span class="hljs-keyword">n</span>个特征, 每一行最后一列为数据的标签.
+首先计算这个数据集的香农熵<span class="hljs-keyword">H</span>, 即初始的混乱程度.
+
+遍历这个数据集特征:
+    当前特征为<span class="hljs-built_in">f</span>
+    得到特征f的所有值的种类, currentFeatValues
+    初始化按照特征f划分数据后的香农熵<span class="hljs-built_in">h</span>
+    遍历currentFeatValues:
+        当前特征值为v
+        使用参数 数据集 f v 来获取一个拆分数据集
+        拆分数据集占原来数据集的百分比 p
+        计算拆分数据集的香农熵 hv
+
+        则: <span class="hljs-keyword">h</span> = <span class="hljs-keyword">h</span> + hv * p
+
+
+    计算按照特征f划分数据的信息增益, <span class="hljs-keyword">H</span> - <span class="hljs-built_in">h</span>
+    判断这个信息增益是否是目前最大的, 如果是则使用这个特征作为划分特征
+</code></pre><p>按照上面的逻辑, 我们可以完成下面的代码</p>
+<pre><code class="language-python">def chooseBestFeatureToSplit(dataSet):
+    <span class="hljs-attr">numFeatures</span> = len(dataSet[<span class="hljs-number">0</span>])  - <span class="hljs-number">1</span> <span class="hljs-comment"># 获取数据集的特征数量</span>
+    <span class="hljs-attr">baseEntropy</span> = calcShannonEnt(dataSet) <span class="hljs-comment"># 计算当前数据集的香农熵</span>
+    <span class="hljs-attr">bestInfoGain</span> = <span class="hljs-number">0.0</span>
+    <span class="hljs-attr">bestFeature</span> = -<span class="hljs-number">1</span>
+
+    <span class="hljs-comment"># 遍历所有的特征列</span>
+    for i <span class="hljs-keyword">in</span> range(numFeatures):
+        <span class="hljs-attr">featList</span> = [example[i] for example <span class="hljs-keyword">in</span> dataSet]  <span class="hljs-comment"># 拿到第i列特征的所有值</span>
+        <span class="hljs-attr">uniqueVals</span> = set(featList) <span class="hljs-comment">#去重</span>
+        <span class="hljs-attr">newEntropy</span> = <span class="hljs-number">0.0</span>
+
+        for value <span class="hljs-keyword">in</span> uniqueVals:
+            <span class="hljs-attr">subDataSet</span> = splitDataSet(dataSet, i, value)
+            <span class="hljs-attr">prob</span> = len(subDataSet) / float(len(dataSet))
+            newEntropy += prob * calcShannonEnt(subDataSet)
+
+        <span class="hljs-attr">infoGain</span> = baseEntropy - newEntropy
+        <span class="hljs-keyword">if</span>(infoGain &gt; bestInfoGain):
+            <span class="hljs-attr">bestInfoGain</span> = infoGain
+            <span class="hljs-attr">bestFeature</span> = i
+
+    return bestFeature
+</code></pre>
+<p>到目前为止, 我们已经可以找出一个数据集中的最佳的划分点. 接下来我们只需要使用递归的技巧, 就可以构建出一个决策树. 但这超出了本文的讨论范围, 有兴趣的可以自己实践. 这里只是记录了香农熵的一些概念及应用, 方便日后的查阅.</p>
+
+    </div>
+</body>
+</html>

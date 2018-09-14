@@ -1,0 +1,130 @@
+<html>
+<meta charset="utf-8" />
+<title>Spring 装配bean基础</title>
+<link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github-gist.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../resource/common.css" type="text/css" />
+<link rel="stylesheet" href="../resource/article.css" type="text/css" />
+
+<body>
+    <div class="main-container">
+        <h1 id="spring-bean-">Spring 装配bean基础</h1>
+<blockquote>
+<p>创建应用对象之间协作关系的行为通常称为<code>装配(wiring)</code>, 这也是依赖注入的本质.  </p>
+</blockquote>
+<p>本文记录了<code>spring</code>在装配bean时的一些基本基础知识.</p>
+<!-- more -->
+<h2 id="spring-">Spring配置的可选方案</h2>
+<p>Spring提供了三种主要的装配机制:  </p>
+<ul>
+<li>在XML中进行显示配置</li>
+<li>在Java中进行显示配置</li>
+<li>隐式的bean发现机制和自动配置</li>
+</ul>
+<p>按照笔者的建议, 尽可能地使用自动配置的机制, 当必须要显示配置的时候, 优先使用类型安全的javaConfig. 因此这里我只记录了自动配置与Java配置.  </p>
+<h2 id="-bean">自动化装配bean</h2>
+<p>spring从两个角度来实现自动化装配:  </p>
+<ul>
+<li>组件扫描(component scanning) Spring会自动发现应用上下文中所创建的bean.</li>
+<li>自动装配(autowiring) Spring自动满足bean之间的依赖</li>
+</ul>
+<h3 id="-bean">创建bean</h3>
+<p><strong>程序2.1</strong> CompactDisc接口在java中定义了CD的概念</p>
+<pre><code>package soundsystem;
+
+public<span class="hljs-built_in"> interface </span>CompactDisc{
+    void play();
+}</code></pre><p><strong>程序2.2</strong> 带有@Component注解的CompactDisc实现类CompactDisc</p>
+<pre><code><span class="hljs-keyword">package</span> soundsystem
+<span class="hljs-keyword">import</span> org.springframework.stereotype.Component;
+
+<span class="hljs-meta">@Component</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SgtPeppers</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">CompactDisc</span></span>{
+    <span class="hljs-keyword">private</span> String title = <span class="hljs-string">"Sgt. Pepper's Lonely Hearts Club Band"</span>;
+    <span class="hljs-keyword">private</span> String artist = <span class="hljs-string">"The Beatles"</span>;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">play</span><span class="hljs-params">()</span></span>{
+        System.out.println(<span class="hljs-string">"Playing "</span> + title + <span class="hljs-string">" by "</span> + artist);
+    }
+}</code></pre><p>上面的代码中使用了注解<code>@Component</code>, 它表明该类会作为组件类, 并告知了Spring要为这个类创建bean.  </p>
+<p>不过组件扫描默认是不启用的, 这里还需要配置一下Spring.  </p>
+<p><strong>程序2.3</strong> @CompoentScan 注解启用组件扫描</p>
+<pre><code><span class="hljs-selector-tag">package</span> <span class="hljs-selector-tag">soundsystem</span>;
+<span class="hljs-selector-tag">import</span> <span class="hljs-selector-tag">org</span><span class="hljs-selector-class">.springframework</span><span class="hljs-selector-class">.context</span><span class="hljs-selector-class">.annotation</span><span class="hljs-selector-class">.componentScan</span>;
+<span class="hljs-selector-tag">import</span> <span class="hljs-selector-tag">org</span><span class="hljs-selector-class">.springframework</span><span class="hljs-selector-class">.context</span><span class="hljs-selector-class">.annotation</span><span class="hljs-selector-class">.Configuration</span>;
+
+@<span class="hljs-keyword">Configuration</span>
+@ComponentScan
+public class CDPlayerConfig{
+}</code></pre><p>上面的代码中, 使用<code>@ComponentScan</code>注解启用扫描, 如果没有其他的配置, @ComponentScan默认扫描与配置类相同的包</p>
+<h3 id="-bean-">为bean命名</h3>
+<p>Spring应用上下文中所有的bean都会给定一个ID, 在前面的例子中, 默认将类名的第一个字母变成小写.  </p>
+<p>如果要自定义bean的ID, 可以使用如下两种方式:  </p>
+<ul>
+<li>值传给@Component注解</li>
+<li>使用@Named注解, Spring支持将@Named作为@Component的替代方案</li>
+</ul>
+<pre><code><span class="hljs-meta">@Component(<span class="hljs-meta-string">"xxxxx"</span>)</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SgtPeppers</span> <span class="hljs-title">implents</span> <span class="hljs-title">CompactDisc</span></span>{
+    ...
+}</code></pre><h3 id="-">设置组件扫描的基础包</h3>
+<p>在@ComponentScan的value属性中指明包的名称:</p>
+<pre><code><span class="hljs-variable">@Configuration</span>
+<span class="hljs-variable">@ComponentScan</span>(<span class="hljs-string">"soundsystem"</span>)
+public class CDPlayerConfig{}</code></pre><p>指明多个基础包</p>
+<pre><code><span class="hljs-variable">@Configuration</span>
+<span class="hljs-variable">@ComponentScan</span>(basePackages={<span class="hljs-string">"sundsystem"</span>, <span class="hljs-string">"video"</span>})
+public class CDPlayerConfig{}</code></pre><p>指定类或接口, 会扫描这些类所在的包. 可以考虑在包中创建一个用来进行扫描的空标记接口, 以此应对之后可能的重构.</p>
+<h3 id="bean-">bean的自动装配</h3>
+<p>自动装配就是让spring自动满足bean依赖的一种方式. 在满足依赖的过程中, 会在spring应用上下文中寻找匹配某个bean需求的其他bean. 可以使用<code>@Autowired</code>注解来声明自动装配.  </p>
+<pre><code><span class="hljs-keyword">package</span> soudsystem;
+<span class="hljs-keyword">import</span> org.springframework.beans.factory.annotation.Autowired;
+<span class="hljs-keyword">import</span> org.springframework.stereotyep.Component;
+
+<span class="hljs-meta">@Component</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CDPlayer</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">MediaPlayer</span></span>{
+    <span class="hljs-keyword">private</span> CompactDisc cd;
+
+    <span class="hljs-meta">@Autowired</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">CDPlayer</span><span class="hljs-params">(CompactDisc cd)</span></span>{
+        <span class="hljs-keyword">this</span>.cd = cd;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">play</span><span class="hljs-params">()</span></span>{
+        cd.play();
+    }
+}</code></pre><p>不管是构造器, Setter方法还是其他的方法, spring都会尝试满足方法参数上所声明的依赖. 当有且只有一个bean匹配依赖需求时, 这个bean会被装配进来.  </p>
+<p>当没有匹配的bean时, 会抛出一个异常, 可以将<code>@Autowired</code>的<code>required</code>属性设置为false来避免异常的出现.</p>
+<h2 id="java-">Java配置实现注入</h2>
+<pre><code><span class="hljs-keyword">package</span> soundsytem;
+<span class="hljs-keyword">import</span> org.springframework.context.annotation.Configuration;
+
+<span class="hljs-meta">@Configuration</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CDPlayerConfig</span></span>{
+    <span class="hljs-meta">@Bean</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> CompactDisc <span class="hljs-title">sgtPeppers</span><span class="hljs-params">()</span></span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> SgtPeppers();
+    }
+
+    <span class="hljs-meta">@Bean</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> CDPlayer <span class="hljs-title">cdPlayer</span><span class="hljs-params">()</span></span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> CDPlayer(sgtPeppers());
+    }
+
+    <span class="hljs-meta">@Bean</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> CDPlayer <span class="hljs-title">cdPlayer</span><span class="hljs-params">(CompactDisc compactDisc)</span></span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> CDPlayer(compactDisc);
+    }
+}</code></pre><p><code>@Configuration</code>注解表明这个类式一个配置类, 该类应该包含在spring上下文中如何创建bean的细节.</p>
+<h2 id="-">本文注解总结</h2>
+<ul>
+<li>@Component 定义一个组件, spring为其创建一个bean, 可定义bean名</li>
+<li>@Named 可替代@Component</li>
+<li>@ComponentScan 启用扫描, 默认扫描与配置类相同的包, 可指定多个包或类</li>
+<li>@Autowired 自动装配</li>
+<li>@Configuration 表明配置类</li>
+<li>@Bean 声明bean</li>
+</ul>
+
+    </div>
+</body>
+</html>

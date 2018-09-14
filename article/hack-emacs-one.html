@@ -1,0 +1,63 @@
+<html>
+<meta charset="utf-8" />
+<title>emacs 改造之一场由代码折叠引发的血案</title>
+<link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github-gist.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../resource/common.css" type="text/css" />
+<link rel="stylesheet" href="../resource/article.css" type="text/css" />
+
+<body>
+    <div class="main-container">
+        <h1 id="emacs-">emacs 改造之一场由代码折叠引发的血案</h1>
+<p>这是一篇记录改造emacs实现代码折叠的过程记录. 虽然使用emacs也已经有大半年了, 但是之前都是借用别人的配置, 自己也就凑活着用了. 今天原本是在研究js设计模式的, 由于写了很多demo函数, 发现没有代码折叠真的很痛苦, 于是转头就开始解决这个问题(我就是这么一个容易跑偏了的人~)  </p>
+<!-- more -->
+
+<h2 id="-">寻找代码折叠函数</h2>
+<p>这个过程其实还是比较容易的, 打开<code>hs-minor-mode</code>即可. 但是在这里我遇到了三个问题.</p>
+<ol>
+<li>在全局配置里默认打开<code>hs-minor-mode</code>时报错了, 这里使用的代码是<code>(hs-minor-mode 1)</code>. 猜想可能是某个原本打开的buffer不支持这个mode</li>
+<li>默认的快捷键实在是太太太蛋疼了</li>
+<li>打开和关闭所有代码块不是一个函数, 打开关闭当前代码块倒可以用一个函数完成</li>
+</ol>
+<h2 id="-">解决问题</h2>
+<h3 id="-1">问题1</h3>
+<p>这个问题我在网上也搜索了一些方案, 看到别人配置代码折叠时都是向指定的buffer添加hook.  </p>
+<p>参照他们的方案, 我需要知道当前编辑js的buffer所对应的hook.  </p>
+<p>在查找如何获取这个hook的过程中, 我发现了<code>C-h m</code>里可以看到当前mode的很详细的信息, 当然也包括了hook.  </p>
+<blockquote>
+<p>In addition to any hooks its parent mode ‘prog-mode’ might have run,this mode runs the hook ‘js-mode-hook’, as the final stepduring initialization.</p>
+</blockquote>
+<p>以上是信息中的关键部分, 我现在知道了hook为<code>js-mode-hook</code>.  </p>
+<p>于是在启动时执行 <code>(addhook &#39;js-mode-hook (lambda () (has-minor-mode 1)))</code>  </p>
+<p>问题1解决</p>
+<h3 id="-2-3">问题2 &amp; 3</h3>
+<p>其实问题2与问题3都是快捷键设置的问题  </p>
+<h4 id="-">打开关闭当前代码块</h4>
+<p>针对打开关闭当前代码块这个功能, 首先找到对应的函数</p>
+<pre><code><span class="hljs-keyword">C</span>-h k
+<span class="hljs-keyword">C</span>-c @ <span class="hljs-keyword">C</span>-c</code></pre><p>于是我知道对应的函数为<code>hs-toggle-hiding</code>.   </p>
+<p>添加按键绑定<code>(global-set-key (kbd &quot;C-,&quot;) &#39;hs-toggle-hiding)</code>  </p>
+<p>搞定</p>
+<h4 id="-">打开关闭所有折叠</h4>
+<p>同样根据默认快捷键找到对应的函数<code>hs-show-all</code>与<code>hs-hide-all</code>.  </p>
+<p>这里我希望通过一个快捷键可以实现两个函数的默认切换.  </p>
+<p>我首先试着查找有没有什么全局变量可以告诉我当前代码的折叠情况, 看了这两个函数的代码, 没啥头绪.于是干脆来个粗暴的方法, 自己写2个函数, 函数内部调用原本的折叠与打开函数, 同时做好快捷键的切换.代码如下:</p>
+<pre><code class="language-lisp">(<span class="hljs-name">defun</span> open-up-folding()
+    (<span class="hljs-name">interactive</span>)
+    (<span class="hljs-name">hs-show-all</span>)
+    (<span class="hljs-name">global-set-key</span> (<span class="hljs-name">kbd</span> <span class="hljs-string">"C-."</span>) 'close-folding))
+
+(<span class="hljs-name">defun</span> close-folding()
+    (<span class="hljs-name">interactive</span>)
+    (<span class="hljs-name">hs-hide-all</span>)
+    (<span class="hljs-name">global-set-key</span> (<span class="hljs-name">kbd</span> <span class="hljs-string">"C-."</span>) 'open-up-folding))
+
+(<span class="hljs-name">global-set-key</span> (<span class="hljs-name">kbd</span> <span class="hljs-string">"C-."</span>) 'close-folding)</code></pre>
+<p>搞定</p>
+<h2 id="-">后记</h2>
+<p>虽然这次只是解决了一个小问题, 而且也许也早有人给出了更合理的方案. 但是这次hack emacs的过程让我感觉很享受. 这个过程中也让我发现了一些emacs里我之前所不熟悉的东西, 比如<code>hook</code>, <code>mode</code>.  </p>
+<p>唯一美中不足的是, js设计模式研究过程被打断了一下. </p>
+<p>还有, 今天睡得又晚了..</p>
+
+    </div>
+</body>
+</html>

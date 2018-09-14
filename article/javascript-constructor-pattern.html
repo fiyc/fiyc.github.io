@@ -1,0 +1,136 @@
+<html>
+<meta charset="utf-8" />
+<title>JavaScript设计模式 - 构造器模式</title>
+<link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github-gist.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../resource/common.css" type="text/css" />
+<link rel="stylesheet" href="../resource/article.css" type="text/css" />
+
+<body>
+    <div class="main-container">
+        <h1 id="javascript-">JavaScript设计模式 - 构造器模式</h1>
+<p>在传统的面向对象的编程语言中, 构造函数是一种特殊的方法, 用于在分配了内存后初始化新创建的对象. 在JavaScript中, 几乎所有东西都是对象, 我们通常会对对象的构造感兴趣.</p>
+<!-- more -->
+<h3 id="-">对象创建</h3>
+<p>在JavaScript中, 有三种常见的方式来创建对象, 如下所示:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">var</span> <span class="hljs-keyword">new</span><span class="hljs-type">Object</span> = {};
+
+<span class="hljs-keyword">var</span> <span class="hljs-keyword">new</span><span class="hljs-type">Object</span> = Object.create( Object.prototype );
+
+<span class="hljs-keyword">var</span> <span class="hljs-keyword">new</span><span class="hljs-type">Object</span> = <span class="hljs-keyword">new</span> <span class="hljs-type">Object</span>();</code></pre>
+<p>下面是四种为对象赋值的方式:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">//1. Dot syntax</span>
+
+<span class="hljs-comment">// Set properties</span>
+newObject.someKey = <span class="hljs-string">"Hello World"</span>;
+
+<span class="hljs-comment">// Get properties</span>
+<span class="hljs-keyword">var</span> value = newObject.someKey;
+
+<span class="hljs-comment">// 2. Square bracket syntax</span>
+
+<span class="hljs-comment">// Set properties</span>
+newObject[<span class="hljs-string">"someKey"</span>] = <span class="hljs-string">"Hello World"</span>;
+
+<span class="hljs-comment">// Get properties</span>
+<span class="hljs-keyword">var</span> value = newObject[<span class="hljs-string">"somekey"</span>];
+
+<span class="hljs-comment">// 3. Object.defineProperty</span>
+
+<span class="hljs-comment">// Set properties</span>
+<span class="hljs-built_in">Object</span>.defineProperty( newObject, <span class="hljs-string">"someKey"</span>, {
+    <span class="hljs-attr">value</span>: <span class="hljs-string">"Hello World"</span>,
+    <span class="hljs-attr">writable</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">enumerable</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">configurable</span>: <span class="hljs-literal">true</span>
+});
+
+<span class="hljs-comment">// If the above feels a little difficult to read, a short-hand could be written as follows</span>
+
+<span class="hljs-keyword">var</span> defineProp = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"> obj, key, value</span>)</span>{
+    <span class="hljs-keyword">var</span> config = {
+        <span class="hljs-attr">value</span>: value,
+        <span class="hljs-attr">writable</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-attr">enumerable</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-attr">configurable</span>: <span class="hljs-literal">true</span>
+    };
+
+<span class="hljs-built_in">Object</span>.defineProperty( obj, key, config );
+};
+
+<span class="hljs-comment">// To use, we then create a new empty "person" object</span>
+<span class="hljs-keyword">var</span> person = <span class="hljs-built_in">Object</span>.create( <span class="hljs-built_in">Object</span>.prototype );
+
+<span class="hljs-comment">// Populate the object with properties</span>
+defineProp( person, <span class="hljs-string">"car"</span>, <span class="hljs-string">"Delorean"</span> );
+defineProp( person, <span class="hljs-string">"dateOfBirth"</span>, <span class="hljs-string">"1981"</span> );
+defineProp( person, <span class="hljs-string">"hasBeard"</span>, <span class="hljs-literal">false</span> );
+
+<span class="hljs-built_in">console</span>.log( person );
+
+<span class="hljs-comment">// 4. Object.defineProperties</span>
+<span class="hljs-built_in">Object</span>.defineProperties( newObject, {
+    <span class="hljs-string">"someKey"</span>: {
+        <span class="hljs-attr">value</span>: <span class="hljs-string">"Hello World"</span>,
+        <span class="hljs-attr">writable</span>: <span class="hljs-literal">true</span>
+    },
+
+    <span class="hljs-string">"anotherKey"</span>: {
+        <span class="hljs-attr">value</span>: <span class="hljs-string">"Foo bar"</span>,
+        <span class="hljs-attr">writable</span>: <span class="hljs-literal">false</span>
+    }
+});
+</code></pre>
+<p>我们之后会提到, 这些方法也可以用来实现继承, 比如如下代码:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Create a race car driver that inherits from the person object</span>
+var <span class="hljs-built_in">driver</span> = Object.create( person );
+
+<span class="hljs-comment">// Set some properties for the driver</span>
+defineProp(<span class="hljs-built_in">driver</span>, <span class="hljs-string">"topSpeed"</span>, <span class="hljs-string">"100mph"</span>);
+
+<span class="hljs-comment">// Get an inherited property</span>
+console.<span class="hljs-built_in">log</span>( <span class="hljs-built_in">driver</span>.dataOfBirth );
+
+<span class="hljs-comment">// Get the property we set</span>
+console.<span class="hljs-built_in">log</span>( <span class="hljs-built_in">driver</span>.topSpeed );</code></pre>
+<h3 id="-">基本构造方法</h3>
+<p>正如我们前面看到的, JavaScript不支持类的概念. 但是他支持对对象使用特殊的构造函数. 通过在调用构造函数时, 用一个简单的前缀<code>new</code>, 我们告诉JavaScript我们希望这个函数作为一个构造函数来创建一个新的对象, 这个对象包含了函数中声明的成员.  </p>
+<p>在构造函数中, 关键字<code>this</code>指向了被创建的对象本身. 一个基本的构造函数如下所示:</p>
+<pre><code class="language-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Car</span>(<span class="hljs-params"> model, year, miles </span>)</span>{
+
+    <span class="hljs-keyword">this</span>.model = model;
+    <span class="hljs-keyword">this</span>.year = year;
+    <span class="hljs-keyword">this</span>.miles = miles;
+
+    <span class="hljs-keyword">this</span>.toString = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.model + <span class="hljs-string">" has done "</span> + <span class="hljs-keyword">this</span>.miles + <span class="hljs-string">" miles"</span>;
+    }
+}
+
+<span class="hljs-comment">// We can create new instances of the car</span>
+<span class="hljs-keyword">var</span> civic = <span class="hljs-keyword">new</span> Car( <span class="hljs-string">"Honda Civic"</span>, <span class="hljs-number">2009</span>, <span class="hljs-number">20000</span> );
+<span class="hljs-keyword">var</span> mondeo = <span class="hljs-keyword">new</span> Car( <span class="hljs-string">"Ford Mondeo"</span>, <span class="hljs-number">2010</span>, <span class="hljs-number">5000</span> );
+
+<span class="hljs-comment">// and then open our browser console to view the</span>
+<span class="hljs-comment">// output of the toString() method being called on</span>
+<span class="hljs-comment">// these objects</span>
+<span class="hljs-built_in">console</span>.log( civic.toString() );
+<span class="hljs-built_in">console</span>.log( mondeo.toString() );</code></pre>
+<p>以上是构造函数模式的简单版本, 但是它还存在着一些问题. 一个问题是它使继承变得困难; 另一个就是<code>toString()</code>在Car构造函数创建每个新对象的时候都被重新定义了, 理想情况下应该在所有Car类型的实例之间共享盖函数.</p>
+<h3 id="-">原型的构造函数</h3>
+<p>像JavaScript中的几乎所有对象一样, 函数都包含一个&quot;原型&quot;对象. 当我们调用一个JavaScript构造函数来创建一个对象时, 构造函数原型的所有属性都会被提供给新对象. 以这种方式, 可以创建多个Car对象来访问相同的原型. 因此我们可以扩展原来的例子如下:</p>
+<pre><code class="language-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Car</span><span class="hljs-params">( model, year, miles )</span></span>{
+    <span class="hljs-keyword">this</span>.model = model;
+    <span class="hljs-keyword">this</span>.year = year;
+    <span class="hljs-keyword">this</span>.miles = miles;
+}
+
+Car.prototype.toString = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.model + <span class="hljs-string">" has done "</span> + <span class="hljs-keyword">this</span>.miles + <span class="hljs-string">" miles"</span>;
+};</code></pre>
+<p>以上的例子中, 所有的Car对象之间共享一个toString()实例.</p>
+<h3 id="-">末</h3>
+<p>本篇内容翻译自 <a href="https://addyosmani.com/resources/essentialjsdesignpatterns/book/index.html#constructorpatternjavascript">学习JavaScript设计模式</a></p>
+
+    </div>
+</body>
+</html>
