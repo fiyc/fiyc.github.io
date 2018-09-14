@@ -4,9 +4,7 @@ date: 2018-04-25 22:43:23
 name: spring-note
 ---
 
-> Spring 学习中
-  
-<!-- more -->
+# Spring学习笔记
 
 ## 装配Bean
 ### 1. 三种装配机制 *P34*
