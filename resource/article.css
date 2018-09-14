@@ -9,9 +9,9 @@
     color: black;
 }
 
-.main-container *{
+/* .main-container *{
     margin: 10px auto;
-}
+} */
 
 .main-container p{
     line-height: 1.8;
@@ -19,16 +19,18 @@
 
 .main-container p code{
    color: #abb2bf; 
-   padding: 0px 5px;
+   padding: 0px 2px;
+   margin: 0px 2px;
    font-family: Consolas,monospace,serif;
-   background-color: #333333;
-   box-shadow: 0px 1px 5px #BCBCBC;
+   background-color: #F4F4F4;
+   /* box-shadow: 0px 1px 5px #BCBCBC; */
+   border: 1px solid #E0E0E0;
    border-radius: 3px;
 }
 
 .main-container pre{
     font-family: Consolas,monospace,serif;
-    background-color:#333333;   
+    background-color:#F4F4F4;   
     box-shadow: 0px 1px 5px #BCBCBC;
     border-radius: 4px;
     color: #abb2bf;
