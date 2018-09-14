@@ -18,7 +18,7 @@
 }
 
 .main-container p code{
-   color: #abb2bf; 
+   color: #D05; 
    padding: 0px 2px;
    margin: 0px 2px;
    font-family: Consolas,monospace,serif;
@@ -33,7 +33,7 @@
     background-color:#F4F4F4;   
     box-shadow: 0px 1px 5px #BCBCBC;
     border-radius: 4px;
-    color: #abb2bf;
+    color: #333;;
     padding: 10px;
     white-space: pre-wrap;
     word-wrap: break-word;
