@@ -1,12 +1,11 @@
 .main-container{
     position: relative;
-    width: 80%;
+    width: 99%;
     height: 100%;
     margin: 0px auto;
 }
 
 .header{
-    /* background-color: gray; */
     padding: 10px 0px;
     font-size: 30px;
     color: gray;
@@ -14,6 +13,7 @@
 
 .header .search{
     height: 30px;
+    width: 100%;
     border-radius: 2px;
     outline: none;
     border: 1px solid #ddd;
